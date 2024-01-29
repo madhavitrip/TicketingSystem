@@ -1,0 +1,10 @@
+.bgimg{
+    background: url('./../../../assets/images/LoginPageBackground.jpg');
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
+    
+}
+.log{
+    background: transparent !important;
+}
