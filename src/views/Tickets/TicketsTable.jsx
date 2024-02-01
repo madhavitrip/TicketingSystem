@@ -36,7 +36,7 @@ const TicketsTable = ({ tickets }) => {
           <tr key={ticket.ticketId}>
             <td>{index + 1}</td>
             <td>{ticket.ticketId}</td>
-            <td>{ticket.creatorId}</td>
+            <td>{ticket.userId}</td>
             <td>{ticket.title}</td>
             <td>{ticket.status}</td>
             <td>{ticket.priority}</td>

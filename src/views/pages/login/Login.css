@@ -1,7 +1,7 @@
 .bgimg{
-    background: url('./../../../assets/images/LoginPageBackground.jpg');
+    background: url('./../../../assets/images/lgbg.jpg');
     background-size: cover;
-    background-position: top;
+    background-position: bottom;
     background-repeat: no-repeat;
     
 }

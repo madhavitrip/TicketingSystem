@@ -52,6 +52,12 @@ const _nav = [
     ],
   },
   // Designations
+  {
+    component: CNavGroup,
+    name: 'Priority',
+    to: '/Priority',
+    icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
+  },
   
   // Roles
   {
@@ -74,6 +80,7 @@ const _nav = [
       },
     ],
   },
+  //Priority
   // Clients
   {
     component: CNavGroup,

@@ -1,4 +1,6 @@
+//Dnt change Akshaya
 import React from 'react'
+
 
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
@@ -36,7 +38,6 @@ const Layout = React.lazy(() => import('./views/forms/layout/Layout'))
 const Range = React.lazy(() => import('./views/forms/range/Range'))
 const Select = React.lazy(() => import('./views/forms/select/Select'))
 const Validation = React.lazy(() => import('./views/forms/validation/Validation'))
-
 const Charts = React.lazy(() => import('./views/charts/Charts'))
 
 // Icons
@@ -55,6 +56,8 @@ const AllUsers = React.lazy(() => import('./views/Users/AllUsers'))
 const AddTicket = React.lazy(() => import('./views/Tickets/AddTicket'))
 const ViewAllTickets = React.lazy(() => import('./views/Tickets/ViewAllTickets'))
 const EditTicket = React.lazy(() => import('./views/Tickets/EditTicket'))
+const Priority = React.lazy(() => import('./views/PriorityTicket/Priority'))
+
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -108,7 +111,9 @@ const routes = [
   { path: '/Tickets', name: 'All Tickets', element: ViewAllTickets, exact: true },
   { path: '/Tickets/AddTicket', name: 'AddTicket', element: AddTicket },
   { path: '/Tickets/ViewAllTickets', name: 'ViewAllTickets', element: ViewAllTickets },
-  { path: '/Tickets/EditTicket/:ticketId', name: 'EditTicket', element: EditTicket }
+  { path: '/Tickets/EditTicket/:ticketId', name: 'EditTicket', element: EditTicket },
+  { path: '/PriorityTicket/Priority', name: 'Priority', element: Priority },
+
 ]
 
 export default routes

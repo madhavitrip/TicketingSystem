@@ -1,5 +1,6 @@
 // Profile Icon and Dropdown
 import React from 'react'
+import {useUser} from './../../context/UserContext'
 import {
   CAvatar,
   CDropdown,
@@ -12,7 +13,13 @@ import { cilSettings, cilArrowThickToRight, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import avatar8 from './../../assets/images/avatars/2.jpg'
 
+
+
 const AppHeaderDropdown = () => {
+  const {logout} = useUser() ;
+  const handleLogout = () => {
+    logout();
+  }
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
@@ -28,8 +35,8 @@ const AppHeaderDropdown = () => {
           Settings
         </CDropdownItem>
         <CDropdownDivider />
-        <CDropdownItem href="#">
-          <CIcon icon={cilArrowThickToRight} className="me-2" />
+        <CDropdownItem onClick={handleLogout}>
+          <CIcon icon={cilArrowThickToRight} className="me-2"  />
           Logout
         </CDropdownItem>
       </CDropdownMenu>
