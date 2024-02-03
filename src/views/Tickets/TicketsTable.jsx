@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import $ from 'jquery';
-
+import './Ticket.css'
 
 
 const TicketsTable = ({ tickets }) => {
@@ -13,8 +13,11 @@ const TicketsTable = ({ tickets }) => {
     },[])
   return (
     
-    <div className='mt-6 table-responsive'>
-      <Table striped bordered hover ref={tableRef} className='table-primary' >
+    <div className='mt-6 table-responsive '>
+      <Table striped bordered hover= "sm">
+
+      
+      <Table striped bordered hover ref={tableRef} className='table-primary ' >
       <thead>
         <tr>
           <th>S.No</th>
@@ -57,6 +60,7 @@ const TicketsTable = ({ tickets }) => {
           </tr>
         ))}
       </tbody>
+    </Table>
     </Table>
     </div>
   );

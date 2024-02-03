@@ -57,6 +57,7 @@ const AddTicket = React.lazy(() => import('./views/Tickets/AddTicket'))
 const ViewAllTickets = React.lazy(() => import('./views/Tickets/ViewAllTickets'))
 const EditTicket = React.lazy(() => import('./views/Tickets/EditTicket'))
 const Priority = React.lazy(() => import('./views/PriorityTicket/Priority'))
+const EditUser = React.lazy(() => import('./views/Users/EditUser'))
 
 
 const routes = [
@@ -106,13 +107,14 @@ const routes = [
   { path: '/widgets', name: 'Widgets', element: Widgets },
   // myrouts
   { path: '/users', name: 'All Users', element: AllUsers, exact: true },
-  { path: '/users/all-users', name: 'All Users', element: AllUsers },
-  { path: '/users/add-user', name: 'Add User', element: AddUser },
+  { path: '/Users/AllUsers', name: 'AllUsers', element: AllUsers },
+  { path: '/Users/AddUser', name: 'AddUser', element: AddUser },
   { path: '/Tickets', name: 'All Tickets', element: ViewAllTickets, exact: true },
   { path: '/Tickets/AddTicket', name: 'AddTicket', element: AddTicket },
   { path: '/Tickets/ViewAllTickets', name: 'ViewAllTickets', element: ViewAllTickets },
   { path: '/Tickets/EditTicket/:ticketId', name: 'EditTicket', element: EditTicket },
   { path: '/PriorityTicket/Priority', name: 'Priority', element: Priority },
+  { path: '/EditUser/:userId', name: 'EditUser', element: EditUser },
 
 ]
 

@@ -3,21 +3,27 @@ import UserTable from "./UserTable";
 import { Link } from "react-router-dom";
 import { Container, Button } from "react-bootstrap";
 
+
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
 
+const OnClickAddUser = () => {
+  window.location.href= './AddUser'
+}
+
   useEffect(() => {
     // Fetch user data from the API
-    fetch("https://localhost:7247/api/Users")
+    fetch("https://localhost:7217/api/Users")
       .then((res) => res.json())
       .then((data) => {
         // Map properties to match UserTable expectations
         const mappedUsers = data.map((user) => ({
-          userId: user.user_ID,
-          username: `${user.firstName} ${user.lastName}`,
-          email: user.emailAddress,
-          name: `${user.firstName} ${user.middleName} ${user.lastName}`,
-          mobileNumber: user.phoneNumber,
+          userId: user.userId,
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+          mobileNo: user.mobileNo,
+          departmentName: user.departmentName,
+          role:user.role,
         }));
 
         setUsers(mappedUsers);
@@ -31,7 +37,7 @@ const AllUsers = () => {
     <Container className="userform border border-3 p-4 my-3">
       <div className="d-flex justify-content-between m-3">
         <h3>Users</h3>
-        <Button as={Link} to="add-user/" className="btn">
+        <Button as={Link} to="add-user/" className="btn" onClick={OnClickAddUser}>
           Add User
         </Button>
       </div>

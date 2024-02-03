@@ -9,6 +9,7 @@ import store from './store'
 import 'datatables.net-dt/css/jquery.dataTables.css'
 import 'datatables.net'
 
+
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <App />

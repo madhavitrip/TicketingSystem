@@ -53,10 +53,10 @@ const _nav = [
   },
   // Designations
   {
-    component: CNavGroup,
-    name: 'Priority',
-    to: '/Priority',
-    icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
+        component:CNavItem,
+        name: 'Priority',
+        to: '/PriorityTicket/Priority',
+        icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
   },
   
   // Roles
@@ -69,13 +69,13 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Add User',
-        to: '/users/add-user',
+        to: '/Users/AddUser',
         icon: <CIcon icon={cilPlus} customClassName="nav-icon" />,
       },
       {
         component: CNavItem,
         name: 'All Users',
-        to: '/users/all-users',
+        to: '/Users/AllUsers',
         icon: <CIcon icon={cilHamburgerMenu} customClassName="nav-icon" />,
       },
     ],

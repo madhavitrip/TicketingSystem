@@ -1,48 +1,29 @@
-import React from 'react'
-import Badge from 'react-bootstrap/Badge';
-import ListGroup from 'react-bootstrap/ListGroup';
+// // PriorityPage.js
+// import React from 'react';
+// import { Pie } from 'react-chartjs-2';
 
-const Priority = () => {
-  return (
-    <ListGroup as="ol" numbered>
-      <ListGroup.Item
-        as="li"
-        className="d-flex justify-content-between align-items-start"
-      >
-        <div className="ms-2 me-auto">
-          <div className="fw-bold">Subheading</div>
-          Cras justo odio
-        </div>
-        <Badge bg="primary" pill>
-          14
-        </Badge>
-      </ListGroup.Item>
-      <ListGroup.Item
-        as="li"
-        className="d-flex justify-content-between align-items-start"
-      >
-        <div className="ms-2 me-auto">
-          <div className="fw-bold">Subheading</div>
-          Cras justo odio
-        </div>
-        <Badge bg="primary" pill>
-          14
-        </Badge>
-      </ListGroup.Item>
-      <ListGroup.Item
-        as="li"
-        className="d-flex justify-content-between align-items-start"
-      >
-        <div className="ms-2 me-auto">
-          <div className="fw-bold">Subheading</div>
-          Cras justo odio
-        </div>
-        <Badge bg="primary" pill>
-          14
-        </Badge>
-      </ListGroup.Item>
-      </ListGroup>
-  );
-}
+// const PriorityPage = () => {
+//   // Mock data for demonstration
+//   const priorityData = {
+//     labels: ['High', 'Medium', 'Low'],
+//     datasets: [
+//       {
+//         data: [20, 30, 50],
+//         backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+//         hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+//       },
+//     ],
+//   };
 
-export default Priority;
+//   return (
+//     <div>
+//       <h2>Priority Page</h2>
+//       <div style={{ maxWidth: '400px', margin: '20px' }}>
+//         <Pie data={priorityData} />
+//       </div>
+//       {/* Add other Priority-related content here */}
+//     </div>
+//   );
+// };
+
+// export default PriorityPage;
