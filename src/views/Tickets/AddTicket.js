@@ -49,7 +49,7 @@ const AddTicket = () => {
         setMessage('Ticket added successfully!');
         setFormData({
           ticketId: '',
-          userId: '',
+          email: '',
           priority: 'low',
           title: '',
           department: '',
@@ -58,7 +58,7 @@ const AddTicket = () => {
           projectType: '',
           dueDate: '',
           description: '',
-          assignedTo: '',
+          assigneeEmail: '',
         });
 
       }).catch(err => console.log(err))
@@ -192,16 +192,16 @@ const AddTicket = () => {
 
         {/* Creator ID */}
         <div className="row mb-3">
-          <label htmlFor="userId" className="col-sm-3 col-form-label text-end">
-            CreatorID:
+          <label htmlFor="email" className="col-sm-3 col-form-label text-end">
+            Creator:
           </label>
           <div className="col-sm-3">
             <input
               type="text"
               className="form-control"
-              id="userId"
-              name="userId"
-              placeholder="Enter CreatorID"
+              id="email"
+              name="email"
+              placeholder="Enter your Email"
               required
               onChange={handleInputChange}
             />
@@ -210,16 +210,16 @@ const AddTicket = () => {
 
 
           {/* Assigned To */}
-          <label htmlFor="assignedTo" className="col-sm-3 col-form-label text-end">
-            Assigned To:
+          <label htmlFor="assigneeEmail" className="col-sm-3 col-form-label text-end">
+            Assignee Email:
           </label>
           <div className="col-sm-3">
             <input
               type="text"
               className="form-control"
-              id="assignedTo"
-              name="assignedTo"
-              placeholder="Enter Assignee Id"
+              id="assigneeEmail"
+              name="assigneeEmail"
+              placeholder="Enter Assignee Email"
               required
               onChange={handleInputChange}
             />

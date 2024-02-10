@@ -4,14 +4,12 @@ import { Table } from 'react-bootstrap';
 import $ from 'jquery';
 
 
-
-const DashboardTable = ({ tickets }) => {
-  const tableRef = useRef(null)
+const LowPriorityTable = ({ tickets }) => {
+    const tableRef = useRef(null)
   useEffect(() => {
     $(tableRef.current).DataTable();
   }, [])
   return (
-
     <div className='mt-6 table-responsive'>
       <Table striped bordered hover ref={tableRef} className='table-primary' >
         <thead>
@@ -26,7 +24,7 @@ const DashboardTable = ({ tickets }) => {
             <th>DueDate</th>
             {/* <th>Department</th>
           <th>ProjectType</th> */}
-            <th>Assignee Email</th>
+            {/* <th>AssignedTo</th> */}
             {/* <th>Actions</th> */}
           </tr>
         </thead>
@@ -43,7 +41,7 @@ const DashboardTable = ({ tickets }) => {
               <td>{new Date(ticket.dueDate).toLocaleString()}</td>
               {/* <td>{ticket.department}</td>
             <td>{ticket.projectType}</td> */}
-              <td>{ticket.assigneeEmail}</td>
+              {/* <td>{ticket.assignedTo}</td> */}
               
             </tr>
           ))}
@@ -52,22 +50,21 @@ const DashboardTable = ({ tickets }) => {
     </div>
   );
 };
+ LowPriorityTable.propTypes = {
+    tickets: PropTypes.arrayOf(
+      PropTypes.shape({
+        // ticketId: PropTypes.number.isRequired,
+        // userId: PropTypes.number.isRequired,
+        title: PropTypes.string.isRequired,
+        status: PropTypes.string.isRequired,
+        priority: PropTypes.string.isRequired,
+        // ticketType: PropTypes.string.isRequired,
+        dueDate: PropTypes.string.isRequired,
+        // department: PropTypes.string.isRequired,
+        // projectType: PropTypes.string.isRequired,
+        // assignedTo: PropTypes.number.isRequired,
+      })
+    ).isRequired,
+  };
 
-DashboardTable.propTypes = {
-  tickets: PropTypes.arrayOf(
-    PropTypes.shape({
-      // ticketId: PropTypes.number.isRequired,
-      // userId: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      status: PropTypes.string.isRequired,
-      priority: PropTypes.string.isRequired,
-      // ticketType: PropTypes.string.isRequired,
-      dueDate: PropTypes.string.isRequired,
-      // department: PropTypes.string.isRequired,
-      // projectType: PropTypes.string.isRequired,
-      assigneeEmail: PropTypes.number.isRequired,
-    })
-  ).isRequired,
-};
-
-export default DashboardTable;
+export default LowPriorityTable;

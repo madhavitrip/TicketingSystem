@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useState } from 'react';
 import './AddUser.css';
 
-
 const onClickViewUser = () => {
   window.location.href = './AllUsers';
 }
@@ -13,14 +12,16 @@ const AddUser = () => {
     lastName: '',
     email: '',
     password: '',
-    //confirmPassword: '',
+    autoGenPass: true,
     mobileNo: '',
     departmentName: '',
     role: '',
     address: '',
     dateOfBirth: '',
+    profilePicturePath: null,
   });
   const [message, setMessage] = useState(null);
+
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
     setFormData((prevData) => ({
@@ -29,14 +30,11 @@ const AddUser = () => {
     }));
   };
 
- 
-
   function handleUserSubmit(event) {
     event.preventDefault();
-    console.log(formData)
+    console.log(formData);
 
     // Validate Date of Birth
-    
     const currentDate = new Date().toISOString().split('T')[0];
     if (formData.dateOfBirth > currentDate) {
       setMessage('Date of Birth must be smaller than the current date.');
@@ -52,18 +50,20 @@ const AddUser = () => {
           lastName: '',
           email: '',
           password: '',
-          //confirmPassword: '',
+          autoGenPass: true,
           mobileNo: '',
           departmentName: '',
           role: '',
           address: '',
           dateOfBirth: '',
+          profilePicturePath: null,
         });
       })
-      .catch(err => console.log(err))
-      setMessage('Error adding User. Please try again.');
+      .catch(err => {
+        console.log(err);
+        setMessage('Error adding User. Please try again.');
+      });
   }
-
   return (
     <div className=" au container mt-2">
       <div className='text-start mb-12 d-flex justify-content-between'>
