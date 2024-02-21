@@ -30,7 +30,7 @@ const UserTable = ({ users }) => {
             <td>{user.email}</td>
             <td>{user.mobileNo}</td>
             <td>{user.departmentName}</td>
-            <th>{user.role}</th>
+            <th>{user.roleName}</th>
             <td className="d-flex gap-3 text-primary">
               <Link >
                 <i className="fa-solid fa-eye text-success"></i>
@@ -53,7 +53,7 @@ UserTable.propTypes = {
       email: PropTypes.string.isRequired,
       mobileNo: PropTypes.string.isRequired,
       departmentName: PropTypes.string.isRequired,
-      role: PropTypes.string.isRequired,
+      roleName: PropTypes.string.isRequired,
     })
   ).isRequired,
 };

@@ -3,6 +3,7 @@ import React from 'react'
 
 
 
+
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
@@ -57,7 +58,7 @@ const AddTicket = React.lazy(() => import('./views/Tickets/AddTicket'))
 const ViewAllTickets = React.lazy(() => import('./views/Tickets/ViewAllTickets'))
 const EditTicket = React.lazy(() => import('./views/Tickets/EditTicket'))
 const Priority = React.lazy(() => import('./views/PriorityTicket/Priority'))
-const Settings = React.lazy(() => import('./views/SettingsNav/Settings'))
+const Department = React.lazy(() => import('./views/Department/Departments'))
 const EditUser = React.lazy(() => import('./views/Users/EditUser'))
 const HighPriority = React.lazy(() => import('./views/PriorityTicket/HighPriority'))
 const MediumPriority = React.lazy(() => import('./views/PriorityTicket/MediumPriority'))
@@ -125,7 +126,7 @@ const routes = [
   { path: '/Tickets/ViewAllTickets', name: 'ViewAllTickets', element: ViewAllTickets },
   { path: '/Tickets/EditTicket/:ticketId', name: 'EditTicket', element: EditTicket },
   { path: '/PriorityTicket/Priority', name: 'Priority', element: Priority },
-  { path: '/SettingsNav/Settings', name: 'Settings', element: Settings },
+  { path: '/Department/Departments', name: 'Department', element: Department },
   { path: '/EditUser/:userId', name: 'EditUser', element: EditUser },
   {path: '/PriorityTicket/HighPriority' , name: 'HighPriority', element: HighPriority},
   {path: '/PriorityTicket/MediumPriority' , name: 'MediumPriority', element: MediumPriority},

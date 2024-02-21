@@ -9,7 +9,12 @@ const DashboardTable = ({ tickets }) => {
   const tableRef = useRef(null)
   useEffect(() => {
     $(tableRef.current).DataTable();
-  }, [])
+  }, []);
+
+  if (!Array.isArray(tickets)) {
+    return <div>No tickets available</div>;
+  }
+  
   return (
 
     <div className='mt-6 table-responsive'>
@@ -34,15 +39,13 @@ const DashboardTable = ({ tickets }) => {
           {tickets.map((ticket, index) => (
             <tr key={ticket.ticketId}>
               <td>{index + 1}</td>
-              {/* <td>{ticket.ticketId}</td> */}
-              {/* <td>{ticket.userId}</td> */}
+             
               <td>{ticket.title}</td>
               <td>{ticket.status}</td>
               <td>{ticket.priority}</td>
-              {/* <td>{ticket.ticketType}</td> */}
+              
               <td>{new Date(ticket.dueDate).toLocaleString()}</td>
-              {/* <td>{ticket.department}</td>
-            <td>{ticket.projectType}</td> */}
+             
               <td>{ticket.assigneeEmail}</td>
               
             </tr>
@@ -65,7 +68,7 @@ DashboardTable.propTypes = {
       dueDate: PropTypes.string.isRequired,
       // department: PropTypes.string.isRequired,
       // projectType: PropTypes.string.isRequired,
-      assigneeEmail: PropTypes.number.isRequired,
+      assigneeEmail: PropTypes.string.isRequired,
     })
   ).isRequired,
 };

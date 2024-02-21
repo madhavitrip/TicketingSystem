@@ -101,11 +101,24 @@ const AppHeader = () => {
               <CIcon icon={cilSettings} size="lg" />
             </CNavLink>
           </CNavItem>
-          <CNavItem>
+          {/* <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilEnvelopeOpen} size="lg" />
             </CNavLink>
-          </CNavItem>
+          </CNavItem> */}
+          <CDropdown variant="nav-item" placement="bottom-end">
+            <CDropdownToggle caret={false}>
+              <CIcon icon={cilEnvelopeOpen} size="lg" />
+              <span className="badge bg-danger ms-1">4</span> {/* Example badge */}
+            </CDropdownToggle>
+            <CDropdownMenu>
+              {/* Place your notification items here */}
+              <CDropdownItem href="#">Notification 1</CDropdownItem>
+              <CDropdownItem href="#">Notification 2</CDropdownItem>
+              <CDropdownItem href="#">Notification 3</CDropdownItem>
+              {/* Add more notifications as needed */}
+            </CDropdownMenu>
+          </CDropdown>
         </CHeaderNav>
         <CHeaderNav>
           <li className="nav-item py-1">

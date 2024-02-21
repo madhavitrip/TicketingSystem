@@ -1,12 +1,16 @@
 import axios from "axios";
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './AddUser.css';
+import { Spinner } from "react-bootstrap";
 
 const onClickViewUser = () => {
   window.location.href = './AllUsers';
 }
 
 const AddUser = () => {
+  const [loading,setLoading]=useState(false);
+  const [departments,setDepartments]=useState([]);
+  const [Roles,setRoles]=useState([]);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -15,12 +19,38 @@ const AddUser = () => {
     autoGenPass: true,
     mobileNo: '',
     departmentName: '',
-    role: '',
+    roleName: '',
     address: '',
     dateOfBirth: '',
     profilePicturePath: null,
   });
   const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    async function fetchDepartments() {
+      try {
+        const response = await axios.get('https://localhost:7217/api/DepartmentClasses');
+        setDepartments(response.data);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    }
+
+    fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    async function fetchRoles() {
+      try {
+        const response = await axios.get('https://localhost:7217/api/Roles');
+        setRoles(response.data);
+      } catch (error) {
+        console.error('Error fetching Roles:', error);
+      }
+    }
+
+    fetchRoles();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
@@ -32,6 +62,7 @@ const AddUser = () => {
 
   function handleUserSubmit(event) {
     event.preventDefault();
+    setLoading(true);
     console.log(formData);
 
     // Validate Date of Birth
@@ -45,6 +76,7 @@ const AddUser = () => {
       .then(res => {
         console.log(res)
         setMessage('User added successfully!');
+        setLoading(false);
         setFormData({
           firstName: '',
           lastName: '',
@@ -53,7 +85,7 @@ const AddUser = () => {
           autoGenPass: true,
           mobileNo: '',
           departmentName: '',
-          role: '',
+          roleName: '',
           address: '',
           dateOfBirth: '',
           profilePicturePath: null,
@@ -62,6 +94,7 @@ const AddUser = () => {
       .catch(err => {
         console.log(err);
         setMessage('Error adding User. Please try again.');
+        setLoading(false);
       });
   }
   return (
@@ -83,7 +116,7 @@ const AddUser = () => {
         {/* Username */}
         <div className="row mb-3">
           <label htmlFor="firstName" className="col-sm-1 col-form-label text-start">
-            FirstName:
+            FirstName<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -99,7 +132,7 @@ const AddUser = () => {
 
           {/* Lastname */}
           <label htmlFor="lastName" className="col-sm-1 col-form-label text-end">
-            LastName:
+            LastName<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -115,7 +148,7 @@ const AddUser = () => {
 
            {/* Mobile Number */}
            <label htmlFor="mobileNo" className="col-sm-1 col-form-label text-start">
-            MobileNo:
+            MobileNo<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -134,7 +167,7 @@ const AddUser = () => {
         {/* Address */}
         <div className="row mb-3">
           <label htmlFor="address" className="col-sm-1 col-form-label text-end">
-            Address:
+            Address<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -150,7 +183,7 @@ const AddUser = () => {
 
           {/* Date of Birth */}
           <label htmlFor="dateOfBirth" className="col-sm-1 col-form-label text-end">
-          DOB:
+          DOB<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -165,7 +198,7 @@ const AddUser = () => {
           </div>
             {/* Email */}
           <label htmlFor="email" className="col-sm-1 col-form-label text-end">
-          Email:
+          Email<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -182,7 +215,7 @@ const AddUser = () => {
 
         {/* Password */}
         <div className="row mb-3">
-          <label htmlFor="password" className="col-sm-1 col-form-label text-start">
+          {/* <label htmlFor="password" className="col-sm-1 col-form-label text-start">
             Password:
           </label>
           <div className="col-sm-3">
@@ -195,39 +228,47 @@ const AddUser = () => {
               required
               onChange={handleInputChange}
             />
-          </div>
+          </div> */}
 
           {/* Department */}
         
           
           <label htmlFor="departmentName" className="col-sm-1 col-form-label text-start">
-            Department:
+            Department<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
-            <input
-              type="text"
-              className="form-control"
+          <select
+              className="form-select"
               id="departmentName"
               name="departmentName"
-              placeholder="Enter department"
+             
               required
               onChange={handleInputChange}
-            />
+            >
+              <option value="">Select department</option>
+              {departments.map(dep => (
+                <option key={dep.id} value={dep.departmentName}>{dep.departmentName}</option>
+              ))}
+            </select>
           </div>
           {/* Designation */}
-          <label htmlFor="role" className="col-sm-1 col-form-label text-start">
-            Designation:
+          <label htmlFor="roleName" className="col-sm-1 col-form-label text-start">
+            Designation<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
-            <input
-              type="text"
-              className="form-control"
-              id="role"
-              name="role"
-              placeholder="Enter designation"
+          <select
+              className="form-select"
+              id="roleName"
+              name="roleName"
+             
               required
               onChange={handleInputChange}
-            />
+            >
+              <option value="">Select Role</option>
+              {Roles.map(role => (
+                <option key={role.roleId} value={role.roleName}>{role.roleName}</option>
+              ))}
+            </select>
           </div>
 
           {/* Confirm Password
@@ -250,8 +291,9 @@ const AddUser = () => {
         <div className="row mb-3">
           <div className="col-sm-3"></div>
           <div className="col-sm-9 text-end">
-            <button type="submit" className="btn btn-primary">
-              Add
+            <button type="submit" className="btn btn-primary"disabled={loading}>
+              {loading? <><Spinner animation="border" size='sm'/>Adding User...</>:" User added"}
+              
             </button>
           </div>
         </div>

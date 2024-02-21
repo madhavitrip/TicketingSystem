@@ -1,125 +1,117 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Spinner } from 'react-bootstrap'
 import DashboardTable from './DashboardTable';
-
+import { useUser } from './../../context/UserContext';
+import './Dashboard.css';
 
 const Dashboard = () => {
-  const [activeCount, setActiveCount] = useState(0);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [unassignedCount, setUnassignedCount] = useState(0);
-  const [completedCount, setCompletedCount] = useState(0);
+  const { user } = useUser();
+  const [counts, setCounts] = useState({
+    active: 0,
+    pending: 0,
+    unassigned: 0,
+    completed: 0
+  });
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStatusCounts = async () => {
+    const fetchCountsAndTickets = async () => {
       try {
-        const activeResponse = await fetch('https://localhost:7217/api/Tickets/status/active');
-        const activeData = await activeResponse.json();
-        setActiveCount(activeData.length);
+        // Fetch counts
+        const countsResponse = await fetch(`https://localhost:7217/api/Tickets/status-count?email=${user.email}`);
+        const countsData = await countsResponse.json();
+        setCounts({
+          active: countsData.activeCount,
+          pending: countsData.pendingCount,
+          unassigned: countsData.unassignedCount,
+          completed: countsData.completedCount
+        });
 
-        const pendingResponse = await fetch('https://localhost:7217/api/Tickets/status/pending');
-        const pendingData = await pendingResponse.json();
-        setPendingCount(pendingData.length);
-
-        const unassignedResponse = await fetch('https://localhost:7217/api/Tickets/status/unassigned');
-        const unassignedData = await unassignedResponse.json();
-        setUnassignedCount(unassignedData.length);
-
-        const completedResponse = await fetch('https://localhost:7217/api/Tickets/status/completed');
-        const completedData = await completedResponse.json();
-        setCompletedCount(completedData.length);
+        // Fetch tickets
+        const ticketsResponse = await fetch(`https://localhost:7217/api/Tickets/ByUser?email=${user.email}`);
+        const ticketsData = await ticketsResponse.json();
+        setTickets(ticketsData);
 
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching status counts:', error);
+        console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
 
-    const fetchTickets = async () => {
-      try {
-        const response = await fetch('https://localhost:7217/api/Tickets');
-        const data = await response.json();
-        setTickets(data);
-      } catch (error) {
-        console.error('Error fetching tickets:', error);
-      }
-    };
+    fetchCountsAndTickets();
+  }, [user]);
 
-    fetchStatusCounts();
-    fetchTickets();
-  }, []);
-
-  return (
-    <div>
-      <Container>
-        <Row className='row-cols-1 row-cols-md-2 row-cols-lg-4'>
-          <Col>
-            <div className="card border-primary mb-3" style={{ maxwidth: '18rem' }}>
-              <div className="card-header border-0 bg-transparent "><h4>Active</h4></div>
-              <div className="card-body text-primary py-0 text-center">
-                <h5 className="card-primary fs-1 ">{activeCount}</h5>
-              </div>
-              <div className=' card-footer border-0 d-flex justify-content-between bg-transparent align-items-center '>
-                <div className=" ">More Info </div>
-                <i className="fa-solid fa-arrow-right text-secondary"></i>
-              </div>
-
-            </div>
-          </Col>
-          <Col>
-            <div className="card border-danger mb-3" style={{ maxwidth: '18rem' }}>
-              <div className="card-header border-0  bg-transparent border-danger"><h4>Pending</h4></div>
-              <div className="card-body text-danger py-0 text-center">
-                <h5 className="card-title fs-1">{pendingCount}</h5>
-              </div>
-              <div className=' card-footer border-0 d-flex justify-content-between bg-transparent border-primary align-items-center'>
-                <div className=" ">More Info </div>
-                <i className="fa-solid fa-arrow-right text-secondary"></i>
-              </div>
-            </div>
-          </Col>
-          <Col>
-            <div className="card border-warning mb-3" style={{ maxwidth: '18rem' }}>
-              <div className="card-header border-0 bg-transparent border-warning"><h4>Unassigned</h4></div>
-              <div className="card-body text-warning py-0 text-center">
-                <h5 className="card-title fs-1">{unassignedCount}</h5>
-              </div>
-              <div className=' card-footer border-0 d-flex justify-content-between bg-transparent border-primary align-items-center'>
-                <div className=" ">More Info </div>
-                <i className="fa-solid fa-arrow-right text-secondary"></i>
-              </div>
-            </div>
-          </Col>
-          <Col>
-            <div className="card border-success mb-3" style={{ maxwidth: '18rem' }}>
-              <div className="card-header border-0 bg-transparent border-success"><h4>Completed</h4></div>
-              <div className="card-body text-success py-0 text-center">
-                <h5 className="card-title fs-1">{completedCount}</h5>
-              </div>
-              <div className=' card-footer border-0 d-flex justify-content-between bg-transparent border-primary align-items-center'>
-                <div className=" ">More Info </div>
-                <i className="fa-solid fa-arrow-right text-secondary"></i>
-              </div>
-            </div>
-          </Col>
-
-        </Row>
-      </Container>
-
-      {loading ? (
-        <div className="text-center">
-          <Spinner animation="border" role="status">
-            <span className='visually-hidden'>loading..</span>
-          </Spinner>
-        </div>
-      ) : (
-
-      <DashboardTable tickets={tickets} />
-      )
-      }
-    </div>
+  return ( 
+    <div> 
+      <Container> 
+        <Row className='row-cols-1 row-cols-md-2 row-cols-lg-4'> 
+          <Col > 
+            <div className="card" > 
+              <div className="card-inner"> 
+                <div className="card-front"> 
+                  <p>Active</p> 
+                </div> 
+                <div className="card-back"> 
+                  <p>{counts.active}</p> 
+                </div> 
+              </div> 
+            </div> 
+          </Col> 
+          <Col  > 
+          <div className="card"> 
+              <div className="card-inner"> 
+                <div className="card-front"> 
+                  <p>Pending</p> 
+                </div> 
+                <div className="card-back"> 
+                  <p>{counts.pending}</p> 
+                </div> 
+              </div> 
+            </div> 
+          </Col> 
+          <Col > 
+          <div className="card"> 
+              <div className="card-inner"> 
+                <div className="card-front"> 
+                  <p>Unassigned</p> 
+                </div> 
+                <div className="card-back"> 
+                  <p>{counts.unassigned}</p> 
+                </div> 
+              </div> 
+            </div> 
+            
+          </Col> 
+          <Col > 
+          <div className="card"> 
+              <div className="card-inner"> 
+                <div className="card-front"> 
+                  <p>Completed</p> 
+                </div> 
+                <div className="card-back"> 
+                  <p>{counts.completed}</p> 
+                </div> 
+              </div> 
+            </div> 
+          </Col> 
+ 
+        </Row> 
+      </Container> 
+ 
+      {loading ? ( 
+        <div className="text-center"> 
+          <Spinner animation="border" role="status"> 
+            <span className='visually-hidden'>loading..</span> 
+          </Spinner> 
+        </div> 
+      ) : ( 
+ 
+        <DashboardTable tickets={tickets} /> 
+      ) 
+      } 
+    </div> 
   );
 };
 

@@ -38,7 +38,7 @@ const Login = () => {
 
     try {
       // Make an API call to authenticate the user
-      const response = await axios.post('https://localhost:7217/api/Login', { email, password });
+      const response = await axios.post('https://localhost:7217/api/Login/Login', { email, password });
 
       if (response && response.data) {
         // If successful, log in the user and redirect

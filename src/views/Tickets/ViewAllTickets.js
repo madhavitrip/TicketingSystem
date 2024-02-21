@@ -1,59 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import TicketsTable from './TicketsTable';
-import { Spinner } from 'react-bootstrap';
-
-const ViewAllTickets = () => {
-    const [tickets, setTickets] = useState([]);
-    
-    const [loading,setLoading]=useState(true);
-    const onClickAddTicket = () => {
-        window.location.href = './AddTicket';
-    }
-
-    useEffect(() => {
-        // Fetch user data from the API
-        fetch('https://localhost:7217/api/Tickets')
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! Status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then((data) => {
-                setTickets(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error('Error fetching user data:', error);
-                setLoading(false);
-            });
-    }, []); // Empty dependency array ensures the effect runs only once on mount
-
-    return (
-        <div>
-            <div className='d-flex justify-content-between mb-3'>
-                <h4>All Tickets</h4>
-                <div className='d-flex gap-2 align-items-center'>
-                
-                <button type="button" className="btn btn-primary" onClick={onClickAddTicket}>
-                    Add Ticket
-                </button>
-                </div>
-            </div>
-            {loading ? (
-                <div className="text-center">
-                    <Spinner animation="border"role="status">
-                        <span className='visually-hidden'>loading..</span>
-                    </Spinner>
-                 </div>
-            ):(
-            
-            <TicketsTable tickets={tickets} />
-            )
-            }
-           
-        </div>
-    );
-};
-
+import React, { useState, useEffect } from 'react'; 
+import TicketsTable from './TicketsTable'; 
+import { Spinner, Button, Dropdown, DropdownButton } from 'react-bootstrap'; 
+ 
+const ViewAllTickets = () => { 
+  const [tickets, setTickets] = useState([]); 
+  const [filteredTickets, setFilteredTickets] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [priorityFilter, setPriorityFilter] = useState('All'); 
+  const [statusFilter, setStatusFilter] = useState('All'); 
+ 
+  const onClickAddTicket = () => { 
+    window.location.href = './AddTicket'; 
+  } 
+ 
+  const fetchData = async (url) => { 
+    try { 
+      const response = await fetch(url); 
+      if (!response.ok) { 
+        throw new Error(`HTTP error! Status: ${response.status}`); 
+      } 
+      const data = await response.json(); 
+      return data; 
+    } catch (error) { 
+      console.error('Error fetching data:', error); 
+      throw error; 
+    } 
+  }; 
+ 
+  useEffect(() => { 
+    const fetchTickets = async () => { 
+      try { 
+        const data = await fetchData('https://localhost:7217/api/Tickets'); 
+        setTickets(data); 
+        setLoading(false); 
+      } catch (error) { 
+        setLoading(false); 
+      } 
+    }; 
+ 
+    fetchTickets(); 
+  }, []); // Empty dependency array ensures the effect runs only once on mount 
+ 
+  useEffect(() => { 
+    const applyFilters = async () => { 
+      try { 
+        let filteredResults = [...tickets]; 
+   
+        if (priorityFilter !== 'All') { 
+          filteredResults = filteredResults.filter(ticket => ticket.priority.toLowerCase() === priorityFilter.toLowerCase()); 
+        } 
+   
+        if (statusFilter !== 'All') { 
+          filteredResults = filteredResults.filter(ticket => ticket.status.toLowerCase() === statusFilter.toLowerCase()); 
+        } 
+   
+        setFilteredTickets(filteredResults); 
+      } catch (error) { 
+        console.error('Error applying filters:', error); 
+      } 
+    }; 
+   
+    applyFilters(); 
+  }, [tickets, priorityFilter, statusFilter]); 
+  
+ 
+  return ( 
+    <div> 
+      <div className='d-flex justify-content-between mb-3'> 
+        <h4>All Tickets</h4> 
+        <div className='d-flex gap-2 align-items-center'> 
+          <DropdownButton title={`Priority: ${priorityFilter}`} variant="info"> 
+            <Dropdown.Item onClick={() => setPriorityFilter('All')}>All</Dropdown.Item> 
+            <Dropdown.Item onClick={() => setPriorityFilter('High')}>High</Dropdown.Item> 
+            <Dropdown.Item onClick={() => setPriorityFilter('Medium')}>Medium</Dropdown.Item> 
+            <Dropdown.Item onClick={() => setPriorityFilter('Low')}>Low</Dropdown.Item> 
+          </DropdownButton> 
+ 
+          <DropdownButton title={`Status: ${statusFilter}`} variant="info"> 
+            <Dropdown.Item onClick={() => setStatusFilter('All')}>All</Dropdown.Item> 
+            <Dropdown.Item onClick={() => setStatusFilter('Active')}>Active</Dropdown.Item> 
+            <Dropdown.Item onClick={() => setStatusFilter('Pending')}>Pending</Dropdown.Item> 
+            <Dropdown.Item onClick={() => setStatusFilter('Unassigned')}>Unassigned</Dropdown.Item> 
+            <Dropdown.Item onClick={() => setStatusFilter('Completed')}>Completed</Dropdown.Item> 
+          </DropdownButton> 
+ 
+          <Button type="button" className="btn btn-primary" onClick={onClickAddTicket}> 
+            Add Ticket 
+          </Button> 
+        </div> 
+      </div> 
+      <div> 
+        {loading ? ( 
+          <div className="text-center"> 
+            <Spinner animation="border" role="status"> 
+              <span className='visually-hidden'>loading..</span> 
+            </Spinner> 
+          </div> 
+        ) : ( 
+          <TicketsTable tickets={statusFilter !== 'All' || priorityFilter !== 'All' ? filteredTickets : tickets} /> 
+        )} 
+      </div> 
+    </div> 
+  ); 
+}; 
+ 
 export default ViewAllTickets;

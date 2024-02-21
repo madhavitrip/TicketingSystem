@@ -23,7 +23,7 @@ const OnClickAddUser = () => {
           name: `${user.firstName} ${user.lastName}`,
           mobileNo: user.mobileNo,
           departmentName: user.departmentName,
-          role:user.role,
+          roleName:user.roleName,
         }));
 
         setUsers(mappedUsers);

@@ -52,20 +52,20 @@ const _nav = [
     ],
   },
   // Priority
-  {
-        component:CNavItem,
-        name: 'Priority',
-        to: '/PriorityTicket/Priority',
-        icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
-  },
+//   {
+//         component:CNavItem,
+//         name: 'Priority',
+//         to: '/PriorityTicket/Priority',
+//         icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
+//   },
 
-  // Status
-  {
-    component:CNavItem,
-    name: 'Status',
-    to: '/TicketStatus/Status',
-    icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
-},
+//   // Status
+//   {
+//     component:CNavItem,
+//     name: 'Status',
+//     to: '/TicketStatus/Status',
+//     icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
+// },
   
   // Roles
   {
@@ -89,11 +89,12 @@ const _nav = [
     ],
   },
   //Priority
+
   // Clients
   {
     component: CNavItem,
-    name: 'Settings',
-    to: '/SettingsNav/Settings',
+    name: 'Department',
+    to: '/Department/Departments',
     icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
     
   },

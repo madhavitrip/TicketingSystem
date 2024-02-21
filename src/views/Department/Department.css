@@ -1,0 +1,149 @@
+.card { 
+    width: 350px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1); 
+    overflow: hidden; 
+    margin: 10px; 
+  } 
+   
+  .card-header { 
+    background-color: #333; 
+    padding: 16px; 
+    text-align: center; 
+  } 
+   
+  .card-header .text-header { 
+    margin: 0; 
+    font-size: 18px; 
+    color: rgb(255, 255, 255); 
+  } 
+   
+  .card-body { 
+    padding: 16px; 
+  } 
+   
+  .form-group { 
+    margin-bottom: 10px; 
+  } 
+   
+  .form-group label { 
+    display: block; 
+    font-size: 14px; 
+    color: #333; 
+    font-weight: bold; 
+    margin-bottom: 1px; 
+  } 
+   
+  .form-group input[type="text"], 
+  .form-group input[type="email"], 
+  .form-group input[type="password"] { 
+    width: 100%; 
+    padding: 8px; 
+    font-size: 14px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+  } 
+   
+  .btn { 
+    padding: 12px 24px; 
+    margin-left: 13px; 
+    font-size: 16px; 
+    border: none; 
+    border-radius: 4px; 
+    background-color: #333; 
+    color: #fff; 
+    text-transform: uppercase; 
+    transition: background-color 0.2s ease-in-out; 
+    cursor: pointer 
+  } 
+   
+  .btn:hover { 
+    background-color: #ccc; 
+    color: #333; 
+  } 
+ 
+ 
+   
+  body { 
+    font-family: 'lato', sans-serif; 
+  } 
+  .container { 
+    max-width: 1000px; 
+    margin-left: auto; 
+    margin-right: auto; 
+    padding-left: 10px; 
+    padding-right: 10px; 
+  } 
+   
+  h2 { 
+    font-size: 26px; 
+    margin: 20px 0; 
+    text-align: center; 
+    small { 
+      font-size: 0.5em; 
+    } 
+  } 
+   
+  .responsive-table { 
+    li { 
+      border-radius: 3px; 
+      padding: 15px 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      margin-bottom: 25px; 
+    } 
+    .table-header { 
+      background-color: #95A5A6; 
+      font-size: 14px; 
+      text-transform: uppercase; 
+      letter-spacing: 0.03em; 
+      padding: 12px 20px; /* Adjusted padding for table row */ 
+    } 
+    .table-row { 
+      background-color: #ffffff; 
+      box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.1); 
+      padding: 12px 20px; /* Adjusted padding for table row */ 
+    } 
+    .col-1 { 
+      flex-basis: 10%; 
+    } 
+    .col-2 { 
+      flex-basis: 40%; 
+    } 
+    .col-3 { 
+      flex-basis: 25%; 
+    } 
+    .col-4 { 
+      flex-basis: 25%; 
+    } 
+     
+    @media all and (max-width: 767px) { 
+      .table-header { 
+        display: none; 
+      } 
+      .table-row{ 
+        background-color: #ffffff; 
+        box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.1); 
+      } 
+      li { 
+        display: block; 
+      } 
+      .col { 
+         
+        flex-basis: 100%; 
+         
+      } 
+      .col { 
+        display: flex; 
+        padding: 10px 0; 
+        &:before { 
+          color: #6C7A89; 
+          padding-right: 10px; 
+          content: attr(data-label); 
+          flex-basis: 50%; 
+          text-align: right; 
+        } 
+      } 
+    } 
+  }

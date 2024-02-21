@@ -1,0 +1,115 @@
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, ListGroup, Form, Button, Collapse } from 'react-bootstrap';
+import axios from 'axios';
+import './Department.css';
+
+const Department = () => {
+    const [departments, setDepartments] = useState([]);
+    const [newDepartment, setNewDepartment] = useState('');
+    const [openCreateDepartment, setOpenCreateDepartment] = useState(false);
+
+    // Fetch departments from the API when the component mounts 
+    useEffect(() => {
+        const fetchDepartments = async () => {
+            try {
+                const response = await axios.get('https://localhost:7217/api/DepartmentClasses');
+                setDepartments(response.data);
+            } catch (error) {
+                console.error('Error fetching departments:', error);
+            }
+        };
+
+        fetchDepartments();
+    }, []); // Empty dependency array ensures this effect runs only once on mount 
+
+    const handleCreateDepartment = async (e) => {
+        e.preventDefault();
+        if (newDepartment.trim() !== '') {
+            try {
+                // Send a POST request to create a new department 
+                const response = await axios.post('https://localhost:7217/api/DepartmentClasses', {
+                    departmentName: newDepartment,
+                });
+
+                // Update the state with the new department from the server response 
+                setDepartments([...departments, response.data]);
+                setNewDepartment('');
+            } catch (error) {
+                console.error('Error creating department:', error);
+            }
+        }
+    };
+
+    return (
+        <Container>
+            <Row>
+                {/* Department List */}
+                <Col md={6}>
+                    <h4>Departments</h4>
+                    <ListGroup>
+                        <ul className="responsive-table">
+                            <li className="table-header mt-3">
+                                <div className="col col-1">SNo.</div>
+                                <div className="col col-2">Department</div>
+                            </li>
+                            {departments.map((dept) => (
+                                <ListGroup.Item key={dept.id}>
+                                    <li className="table-row mt-1">
+                                        <div className="col col-1" data-label="SNo.">{dept.id}</div>
+                                        <div className="col col-2" data-label="Department">{dept.departmentName}</div>
+                                    </li>
+                                </ListGroup.Item>
+                            ))}
+                        </ul>
+                    </ListGroup>
+                </Col>
+
+                {/* Create Department Form */}
+                <Col md={6} className="position-relative">
+                    <Button
+                        onClick={() => setOpenCreateDepartment(!openCreateDepartment)}
+                        aria-controls="create-department-collapse"
+                        aria-expanded={openCreateDepartment}
+                        className="mb-3 position-absolute top-0 end-0"
+
+                    >
+                        Create
+                    </Button>
+
+                    <Collapse in={openCreateDepartment}>
+                        <div id="create-department-collapse">
+                            <div className="mt-3"> {/* Add margin top to create space below the button */}
+                                <div className="card">
+                                    <div className="card-header">
+                                        <div className="text-header">Create Department</div>
+                                    </div>
+                                    <div className="card-body">
+                                        <Form onSubmit={handleCreateDepartment}>
+                                            <div className="form-group">
+                                                <label htmlFor="department">Enter New Department:</label>
+                                                <input
+                                                    required=""
+                                                    className="form-control"
+                                                    name="department"
+                                                    id="department"
+                                                    type="text"
+                                                    value={newDepartment}
+                                                    onChange={(e) => setNewDepartment(e.target.value)}
+                                                />
+                                            </div>
+                                            <Button type="submit" className="btn">
+                                                Submit
+                                            </Button>
+                                        </Form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Collapse>
+                </Col>
+            </Row>
+        </Container>
+    );
+};
+
+export default Department;

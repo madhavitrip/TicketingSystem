@@ -147,7 +147,7 @@ const EditUser = () => {
                     </label>
                     <div className="col-sm-3">
                         <input
-                            type="text"
+                            type="date"
                             className="form-control"
                             id="dateOfBirth"
                             name="dateOfBirth"
@@ -177,7 +177,7 @@ const EditUser = () => {
 
                 {/* Password */}
                 <div className="row mb-3">
-                    <label htmlFor="password" className="col-sm-1 col-form-label text-start">
+                    {/* <label htmlFor="password" className="col-sm-1 col-form-label text-start">
                         Password:
                     </label>
                     <div className="col-sm-3">
@@ -191,7 +191,7 @@ const EditUser = () => {
                             onChange={handleInputChange}
                             value={formData.password}
                         />
-                    </div>
+                    </div> */}
 
                     {/* Department */}
 
