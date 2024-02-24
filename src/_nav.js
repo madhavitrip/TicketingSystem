@@ -59,13 +59,13 @@ const _nav = [
 //         icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
 //   },
 
-//   // Status
-//   {
-//     component:CNavItem,
-//     name: 'Status',
-//     to: '/TicketStatus/Status',
-//     icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
-// },
+  // Status
+  {
+    component:CNavItem,
+    name: 'Notification',
+    to: '/Notification/notify',
+    icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
+},
   
   // Roles
   {

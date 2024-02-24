@@ -60,15 +60,17 @@ const EditTicket = React.lazy(() => import('./views/Tickets/EditTicket'))
 const Priority = React.lazy(() => import('./views/PriorityTicket/Priority'))
 const Department = React.lazy(() => import('./views/Department/Departments'))
 const EditUser = React.lazy(() => import('./views/Users/EditUser'))
-const HighPriority = React.lazy(() => import('./views/PriorityTicket/HighPriority'))
-const MediumPriority = React.lazy(() => import('./views/PriorityTicket/MediumPriority'))
-const LowPriority = React.lazy(() => import('./views/PriorityTicket/LowPriority'))
-const Status = React.lazy(() => import('./views/TicketStatus/Status'))
+
+const Notification = React.lazy(() => import('./views/Notification/notify'))
+
+//unused
 const ActiveStatus = React.lazy(() => import('./views/TicketStatus/ActiveStatus'))
 const PendingStatus = React.lazy(() => import('./views/TicketStatus/PendingStatus'))
 const UnassignedStatus = React.lazy(() => import('./views/TicketStatus/UnassignedStatus'))
 const CompletedStatus = React.lazy(() => import('./views/TicketStatus/CompletedStatus'))
-
+const HighPriority = React.lazy(() => import('./views/PriorityTicket/HighPriority'))
+const MediumPriority = React.lazy(() => import('./views/PriorityTicket/MediumPriority'))
+const LowPriority = React.lazy(() => import('./views/PriorityTicket/LowPriority'))
 
 
 
@@ -131,7 +133,7 @@ const routes = [
   {path: '/PriorityTicket/HighPriority' , name: 'HighPriority', element: HighPriority},
   {path: '/PriorityTicket/MediumPriority' , name: 'MediumPriority', element: MediumPriority},
   {path: '/PriorityTicket/LowPriority' , name: 'LowPriority', element: LowPriority},
-  { path: '/TicketStatus/Status', name: 'Status', element: Status },
+  { path: '/Notification/notify', name: 'Notification', element: Notification },
   { path: '/TicketStatus/ActiveStatus', name: 'ActiveStatus', element: ActiveStatus },
   { path: '/TicketStatus/PendingStatus', name: 'PendingStatus', element: PendingStatus },
   { path: '/TicketStatus/UnassignedStatus', name: 'UnassignedStatus', element: UnassignedStatus },

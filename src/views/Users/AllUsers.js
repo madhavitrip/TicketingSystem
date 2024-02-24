@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import UserTable from "./UserTable";
 import { Link } from "react-router-dom";
 import { Container, Button } from "react-bootstrap";
+import PermissionChecker from "./../../context/PermissionChecker";
 
 
 const AllUsers = () => {
@@ -34,16 +35,22 @@ const OnClickAddUser = () => {
   }, []); // Empty dependency array ensures the effect runs only once on mount
 
   return (
+    <PermissionChecker>
+    {({ hasPermission }) => (
     <Container className="userform border border-3 p-4 my-3">
       <div className="d-flex justify-content-between m-3">
         <h3>Users</h3>
+        {hasPermission(1, "can_Add") && (
         <Button as={Link} to="add-user/" className="btn" onClick={OnClickAddUser}>
           Add User
         </Button>
+        )}
       </div>
       <hr />
-      <UserTable users={users} />
+      <UserTable users={users} hasPermission={hasPermission} />
     </Container>
+    )}
+    </PermissionChecker>
   );
 };
 
