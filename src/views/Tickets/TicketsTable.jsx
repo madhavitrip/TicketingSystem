@@ -6,8 +6,10 @@ import $ from 'jquery';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; 
 import { faEye, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'; 
 import './Ticket.css'; 
+import PermissionChecker from './../../context/PermissionChecker';
  
-const TicketsTable = ({ tickets }) => { 
+const TicketsTable = ({ tickets, hasPermission }) => { 
+
   const [modalShow, setModalShow] = useState(false); 
   const [selectedTicket, setSelectedTicket] = useState(null); 
   const tableRef = useRef(null); 
@@ -56,14 +58,16 @@ const TicketsTable = ({ tickets }) => {
             <td>{ticket.projectType}</td> 
             {/* <td>{ticket.assigneeEmail}</td> */} 
             <td> 
+
                   <div className="d-flex gap-3 align-items-center"> 
-                    <Link to={`EditTicket/${ticket.ticketId}`}> 
+                  {hasPermission(2, 'canUpdateOnly') && <Link to={`EditTicket/${ticket.ticketId}`}> 
                       <FontAwesomeIcon icon={faPenToSquare} className="text-primary" /> 
-                    </Link> 
-                    <Button variant="link" onClick={() => handleViewTicket(ticket)}> 
+                    </Link>  }
+                    
+                    {hasPermission(2, 'canViewOnly') && <Button variant="link" onClick={() => handleViewTicket(ticket)}> 
                       <FontAwesomeIcon icon={faEye} className="text-success" /> 
-                    </Button> 
-                    <FontAwesomeIcon icon={faTrash} className="text-danger" /> 
+                    </Button> }
+                    {hasPermission(2, 'canDeleteOnly') && <FontAwesomeIcon icon={faTrash} className="text-danger" /> }
                   </div> 
                 </td> 
           </tr> 
@@ -126,6 +130,7 @@ PropTypes.number.isRequired,
             // assigneeEmail: PropTypes.string.isRequired, 
     }) 
   ).isRequired, 
+  hasPermission: PropTypes.func.isRequired,
 }; 
  
 export default TicketsTable;

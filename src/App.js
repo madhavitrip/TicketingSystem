@@ -17,6 +17,7 @@ const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 const ForgotPassword = React.lazy(() => import('./views/pages/Password/ForgotPassword'))
 const ChangePassword = React.lazy(()=> import('./views/pages/Password/ChangePassword'))
+const AccessDeniedPage = React.lazy(()=> import('./views/pages/page403/AccessDenied'))
 
 const App = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
@@ -53,6 +54,7 @@ const App = () => {
           <Route exact path="/register" name="Register Page" element={<Register />} />
           <Route exact path="/404" name="Page 404" element={<Page404 />} />
           <Route exact path="/500" name="Page 500" element={<Page500 />} />
+          <Route path="/403" name="Access Denied" element={<AccessDeniedPage />} />
           <Route exact path="/ForgotPassword" name="Forgot Password" element={<ForgotPassword />} />
           <Route exact path="/ChangePassword" name="Change Password" element={<ChangePassword/>}/>
           <Route path="*" name="Home" element={<PrivateRoute element={<DefaultLayout/>}/>} />

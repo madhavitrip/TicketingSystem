@@ -24,7 +24,7 @@ const OnClickAddUser = () => {
           name: `${user.firstName} ${user.lastName}`,
           mobileNo: user.mobileNo,
           departmentName: user.departmentName,
-          roleName:user.roleName,
+          role:user.role,
         }));
 
         setUsers(mappedUsers);
@@ -40,8 +40,8 @@ const OnClickAddUser = () => {
     <Container className="userform border border-3 p-4 my-3">
       <div className="d-flex justify-content-between m-3">
         <h3>Users</h3>
-        {hasPermission(1, "can_Add") && (
-        <Button as={Link} to="add-user/" className="btn" onClick={OnClickAddUser}>
+        {hasPermission(1, "canAddOnly") && (
+        <Button as={Link} to="AddUser/" className="btn" onClick={OnClickAddUser}>
           Add User
         </Button>
         )}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; 
 import TicketsTable from './TicketsTable'; 
 import { Spinner, Button, Dropdown, DropdownButton } from 'react-bootstrap'; 
+import PermissionChecker from './../../context/PermissionChecker';
  
 const ViewAllTickets = () => { 
   const [tickets, setTickets] = useState([]); 
@@ -65,42 +66,48 @@ const ViewAllTickets = () => {
   
  
   return ( 
-    <div> 
-      <div className='d-flex justify-content-between mb-3'> 
-        <h4>All Tickets</h4> 
-        <div className='d-flex gap-2 align-items-center'> 
-          <DropdownButton title={`Priority: ${priorityFilter}`} variant="info"> 
-            <Dropdown.Item onClick={() => setPriorityFilter('All')}>All</Dropdown.Item> 
-            <Dropdown.Item onClick={() => setPriorityFilter('High')}>High</Dropdown.Item> 
-            <Dropdown.Item onClick={() => setPriorityFilter('Medium')}>Medium</Dropdown.Item> 
-            <Dropdown.Item onClick={() => setPriorityFilter('Low')}>Low</Dropdown.Item> 
-          </DropdownButton> 
- 
-          <DropdownButton title={`Status: ${statusFilter}`} variant="info"> 
-            <Dropdown.Item onClick={() => setStatusFilter('All')}>All</Dropdown.Item> 
-            <Dropdown.Item onClick={() => setStatusFilter('Active')}>Active</Dropdown.Item> 
-            <Dropdown.Item onClick={() => setStatusFilter('Pending')}>Pending</Dropdown.Item> 
-            <Dropdown.Item onClick={() => setStatusFilter('Unassigned')}>Unassigned</Dropdown.Item> 
-            <Dropdown.Item onClick={() => setStatusFilter('Completed')}>Completed</Dropdown.Item> 
-          </DropdownButton> 
- 
-          <Button type="button" className="btn btn-primary" onClick={onClickAddTicket}> 
-            Add Ticket 
-          </Button> 
+    <PermissionChecker>
+      {({hasPermission}) => (
+        <div> 
+        <div className='d-flex justify-content-between mb-3'> 
+          <h4>All Tickets</h4> 
+          <div className='d-flex gap-2 align-items-center'> 
+            <DropdownButton title={`Priority: ${priorityFilter}`} variant="info"> 
+              <Dropdown.Item onClick={() => setPriorityFilter('All')}>All</Dropdown.Item> 
+              <Dropdown.Item onClick={() => setPriorityFilter('High')}>High</Dropdown.Item> 
+              <Dropdown.Item onClick={() => setPriorityFilter('Medium')}>Medium</Dropdown.Item> 
+              <Dropdown.Item onClick={() => setPriorityFilter('Low')}>Low</Dropdown.Item> 
+            </DropdownButton> 
+   
+            <DropdownButton title={`Status: ${statusFilter}`} variant="info"> 
+              <Dropdown.Item onClick={() => setStatusFilter('All')}>All</Dropdown.Item> 
+              <Dropdown.Item onClick={() => setStatusFilter('Active')}>Active</Dropdown.Item> 
+              <Dropdown.Item onClick={() => setStatusFilter('Pending')}>Pending</Dropdown.Item> 
+              <Dropdown.Item onClick={() => setStatusFilter('Unassigned')}>Unassigned</Dropdown.Item> 
+              <Dropdown.Item onClick={() => setStatusFilter('Completed')}>Completed</Dropdown.Item> 
+            </DropdownButton> 
+   
+            <Button type="button" className="btn btn-primary" onClick={onClickAddTicket}> 
+              Add Ticket 
+            </Button> 
+          </div> 
+        </div> 
+        <div> 
+          {loading ? ( 
+            <div className="text-center"> 
+              <Spinner animation="border" role="status"> 
+                <span className='visually-hidden'>loading..</span> 
+              </Spinner> 
+            </div> 
+          ) : ( 
+            <TicketsTable tickets={statusFilter !== 'All' || priorityFilter !== 'All' ? filteredTickets : tickets} hasPermission={hasPermission} /> 
+          )} 
         </div> 
       </div> 
-      <div> 
-        {loading ? ( 
-          <div className="text-center"> 
-            <Spinner animation="border" role="status"> 
-              <span className='visually-hidden'>loading..</span> 
-            </Spinner> 
-          </div> 
-        ) : ( 
-          <TicketsTable tickets={statusFilter !== 'All' || priorityFilter !== 'All' ? filteredTickets : tickets} /> 
-        )} 
-      </div> 
-    </div> 
+
+      )}
+    </PermissionChecker>
+    
   ); 
 }; 
  

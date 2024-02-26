@@ -1,16 +1,17 @@
 import axios from "axios";
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AddUser.css';
 import { Spinner } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
 
 const onClickViewUser = () => {
   window.location.href = './AllUsers';
 }
 
 const AddUser = () => {
-  const [loading,setLoading]=useState(false);
-  const [departments,setDepartments]=useState([]);
-  const [Roles,setRoles]=useState([]);
+  const [loading, setLoading] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [Roles, setRoles] = useState([]);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -19,7 +20,7 @@ const AddUser = () => {
     autoGenPass: true,
     mobileNo: '',
     departmentName: '',
-    roleName: '',
+    role: '',
     address: '',
     dateOfBirth: '',
     profilePicturePath: null,
@@ -29,7 +30,7 @@ const AddUser = () => {
   useEffect(() => {
     async function fetchDepartments() {
       try {
-        const response = await axios.get('https://localhost:7217/api/DepartmentClasses');
+        const response = await axios.get('https://localhost:7217/api/Departments');
         setDepartments(response.data);
       } catch (error) {
         console.error('Error fetching departments:', error);
@@ -60,6 +61,8 @@ const AddUser = () => {
     }));
   };
 
+  const navigate = useNavigate();
+
   function handleUserSubmit(event) {
     event.preventDefault();
     setLoading(true);
@@ -85,11 +88,13 @@ const AddUser = () => {
           autoGenPass: true,
           mobileNo: '',
           departmentName: '',
-          roleName: '',
+          role: '',
           address: '',
           dateOfBirth: '',
           profilePicturePath: null,
         });
+        // Redirect to the notification page after user is added
+        navigate('/Notification/notify');
       })
       .catch(err => {
         console.log(err);
@@ -97,6 +102,7 @@ const AddUser = () => {
         setLoading(false);
       });
   }
+
   return (
     <div className=" au container mt-2">
       <div className='text-start mb-12 d-flex justify-content-between'>
@@ -252,21 +258,21 @@ const AddUser = () => {
             </select>
           </div>
           {/* Designation */}
-          <label htmlFor="roleName" className="col-sm-1 col-form-label text-start">
+          <label htmlFor="role" className="col-sm-1 col-form-label text-start">
             Designation<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
           <select
               className="form-select"
-              id="roleName"
-              name="roleName"
+              id="role"
+              name="role"
              
               required
               onChange={handleInputChange}
             >
               <option value="">Select Role</option>
               {Roles.map(role => (
-                <option key={role.roleId} value={role.roleName}>{role.roleName}</option>
+                <option key={role.roleId} value={role.role}>{role.role}</option>
               ))}
             </select>
           </div>
@@ -292,7 +298,7 @@ const AddUser = () => {
           <div className="col-sm-3"></div>
           <div className="col-sm-9 text-end">
             <button type="submit" className="btn btn-primary"disabled={loading}>
-              {loading? <><Spinner animation="border" size='sm'/>Adding User...</>:" User added"}
+              {loading? <><Spinner animation="border" size='sm'/>Adding User...</>:" Add User"}
               
             </button>
           </div>

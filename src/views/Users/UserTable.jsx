@@ -3,45 +3,50 @@ import PropTypes from "prop-types";
 import { Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import $ from 'jquery';
+import { FontAwesomeIcon} from "@fortawesome/react-fontawesome"; 
+import {faEye, faPenToSquare, faTrash} from '@fortawesome/free-solid-svg-icons'
 
-const UserTable = ({ users }) => {
-  const tableRef= useRef(null)
-    useEffect(() =>{
-      $(tableRef.current).DataTable();
-    }, [])
+const UserTable = ({ users,hasPermission }) => {
+  const tableRef = useRef(null)
+  useEffect(() => {
+    $(tableRef.current).DataTable();
+  }, [])
   return (
-    <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>User ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Mobile Number</th>
-          <th>Department</th>
-          <th>Designation</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((user) => (
-          <tr key={user.userId}>
-            <td>{user.userId}</td>
-            <td>{user.name}</td>
-            <td>{user.email}</td>
-            <td>{user.mobileNo}</td>
-            <td>{user.departmentName}</td>
-            <th>{user.roleName}</th>
-            <td className="d-flex gap-3 text-primary">
-              <Link >
-                <i className="fa-solid fa-eye text-success"></i>
-              </Link>
-              <Link to={`../EditUser/${user.userId}`}><i className="fa-solid fa-pen-to-square"></i></Link>
-              <Link><i className="fa-solid fa-trash text-danger"></i></Link>
-            </td>
+    <div className="table-responsive">
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Actions</th>
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.userId}>
+              <td>{user.userId}</td>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>{user.mobileNo}</td>
+              <td>{user.departmentName}</td>
+              <th>{user.role}</th>
+              <td className="d-flex gap-3 text-primary">
+              <div className="d-flex gap-3 text-primary justify-content-center"> 
+                  {hasPermission(1, 'canViewOnly') && <Link to={`Views/${user.userId}`}><FontAwesomeIcon icon={faEye} className="text-success"/></Link> } 
+                  {hasPermission(1, 'canUpdateOnly') && <Link to={`/Users/EditUser/${user.userId}`}><FontAwesomeIcon icon={faPenToSquare} className="text-primary"/> </Link>} 
+                  {hasPermission(1, 'canDeleteOnly') && <FontAwesomeIcon icon={faTrash} className="text-danger"/>} 
+                </div>
+
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
   );
 };
 
@@ -53,9 +58,10 @@ UserTable.propTypes = {
       email: PropTypes.string.isRequired,
       mobileNo: PropTypes.string.isRequired,
       departmentName: PropTypes.string.isRequired,
-      roleName: PropTypes.string.isRequired,
+      role: PropTypes.string.isRequired,
     })
   ).isRequired,
+  hasPermission: PropTypes.func.isRequired,
 };
 
 export default UserTable;

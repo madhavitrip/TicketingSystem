@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState,useEffect } from 'react';
 import { useUser } from './../../context/UserContext';
 import {  Spinner } from 'react-bootstrap';
+// import { useNavigate } from "react-router-dom";
 
 
 
@@ -10,6 +11,7 @@ const onClickViewTicket = () => {
 }
 
 const AddTicket = () => {
+  // const navigate = useNavigate();
   const { user } = useUser();
   const [loading,setLoading]= useState(false)
   const[ticketType,setTicketType]=useState([]);
@@ -109,6 +111,7 @@ const AddTicket = () => {
         description: '',
         assigneeEmail: '',
       });
+      // navigate(`/Tickets/AddTicket/${res.data.userId}`);
     } catch (err) {
       console.error(err);
       setMessage('Error adding ticket. Please try again.');

@@ -60,12 +60,12 @@ const _nav = [
 //   },
 
   // Status
-  {
-    component:CNavItem,
-    name: 'Notification',
-    to: '/Notification/notify',
-    icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
-},
+//   {
+//     component:CNavItem,
+//     name: 'Notification',
+//     to: '/Notification/notify',
+//     icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
+// },
   
   // Roles
   {

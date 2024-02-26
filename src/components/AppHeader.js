@@ -109,7 +109,7 @@ const AppHeader = () => {
           <CDropdown variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false}>
               <CIcon icon={cilEnvelopeOpen} size="lg" />
-              <span className="badge bg-danger ms-1">4</span> {/* Example badge */}
+              <span className="badge bg-danger ms-1">3</span> {/* Example badge */}
             </CDropdownToggle>
             <CDropdownMenu>
               {/* Place your notification items here */}

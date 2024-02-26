@@ -14,13 +14,16 @@ const PermissionDecorator = ({ element, moduleId, permissionType }) => {
     const fetchPermissions = async () => {
       try {
         const userId = user.userId; // Assuming you are using a fixed userId for now
-        const response = await axios.get(`https://localhost:7247/api/Permissions/ByUser/${userId}`);
+        console.log("userId")
+        console.log(userId)
+        const response = await axios.get(`https://localhost:7217/api/Permission/ByUser/${userId}`);
         setPermissions(response.data);
         setLoading(false);
         console.log(response.data);
       } catch (error) {
         console.error('Error fetching permissions:', error);
         setLoading(false);
+        // return <Navigate to="/403" />;
       }
     };
 
@@ -32,7 +35,7 @@ const PermissionDecorator = ({ element, moduleId, permissionType }) => {
   }
 
   const canAccess = (moduleId, permissionType) => {
-    const permission = permissions.find(p => p.module_Id === moduleId);
+    const permission = permissions.find(p => p.id === moduleId);
     return permission && permission[permissionType];
   };
 
