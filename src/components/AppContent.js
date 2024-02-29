@@ -29,6 +29,7 @@ const AppContent = () => {
           {/* <Route path="/" name="Home" element={<Dashboard />} /> */}
           <Route path="/dashboard" name="Dashboard" element={<Dashboard />} />
           <Route path="/UserProfile" name="Profile" element={<Profile />} />
+          
           <Route path="*" element={<Navigate to="/dashboard" />} />
           <Route path="/Users/AllUsers" name="All Users" element={<PermissionDecorator moduleId={1} permissionType="canViewOnly" element={<AllUsers />} />} />
           <Route path="/Users/AddUser" name="Add User" element={<PermissionDecorator moduleId={1} permissionType="canAddOnly" element={<AddUser />} />} />
@@ -39,6 +40,7 @@ const AppContent = () => {
           <Route path= "/Tickets" name= "View All Tickets" element={<PermissionDecorator moduleId={2} permissionType="canViewOnly" element={<ViewAllTickets/>}/>} />
           <Route path= "/Tickets/EditTicket/:ticketId" name= "Edit Ticket" element={<PermissionDecorator moduleId={2} permissionType="canUpdateOnly" element={<EditTicket/>}/>} />
           <Route path= "/Department/Departments" name= "Department" element={<PermissionDecorator moduleId={3} permissionType="canViewOnly" element={<Department/>}/>} /> 
+          <Route path= "/Department/Departments" name= "Department" element={<PermissionDecorator moduleId={3} permissionType="canAddOnly" element={<Department/>}/>} /> 
           {/* <Route path="/403" name="Access Denied" element={<AccessDeniedPage />} /> */}
         </Routes>
       </Suspense>

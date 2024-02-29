@@ -1,36 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { Row, Col, Button, Form, Modal } from 'react-bootstrap';
+import { Row, Col, Button, Form,Modal } from 'react-bootstrap';
 import './EditTicket.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCommentDots, faPaperclip } from '@fortawesome/free-solid-svg-icons';
 import { useUser } from './../../context/UserContext';
-import ReactQuill from 'react-quill';  // Import ReactQuill
-import 'react-quill/dist/quill.snow.css';  // Import Quill styles
 
-
-const toolbarOptions = [
-  ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-  ['blockquote', 'code-block'],
-
-  [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-  [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-  [{ 'script': 'sub' }, { 'script': 'super' }],     // superscript/subscript
-  [{ 'indent': '-1' }, { 'indent': '+1' }],         // outdent/indent
-  [{ 'direction': 'rtl' }],                         // text direction
-
-  [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-  [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-  [{ 'font': [] }],
-  [{ 'align': [] }],
-
-  ['clean'],                                        // remove formatting button
-
-  ['link', 'image', 'video'],                       // link and image, video
-];
 
 const EditTicket = () => {
   const { user } = useUser();
@@ -61,14 +37,14 @@ const EditTicket = () => {
   const [assignees, setAssignees] = useState([]);
   const [ticketTypes, setTicketTypes] = useState([]);
   const [currentDateTime, setCurrentDateTime] = useState(null);
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   useEffect(() => {
     async function fetchTicketDetails() {
       try {
         const [ticketResponse, commentsResponse, assigneesResponse, ticketTypesResponse] = await Promise.all([
           axios.get(`https://localhost:7217/api/Tickets/${ticketId}`),
-          axios.get(`https://localhost:7217/api/TicketFlow/CommentsByTicketId/${ticketId}`).catch(() => ({ data: [] })),
+          axios.get(`https://localhost:7217/api/TicketFlow/CommentsByTicketId/${ticketId}`).catch(() => ({data: []})),
           axios.get('https://localhost:7217/api/Users'),
           axios.get('https://localhost:7217/api/TicketTypes'),
         ]);
@@ -113,33 +89,23 @@ const EditTicket = () => {
     }));
   };
 
-  const handleToggleUserComment = () => {  if (comments.length > 0) {
-    const lastComment = comments[comments.length - 1];    setFormData({
-      ...formData,      userAssigneeEmail: lastComment.newAssigneeEmail,
-      userTicketType: lastComment.newTicketType,      userStatus: lastComment.newStatus,
-      userPriority: lastComment.newPriority,    });
-  } else {    // If there are no comments, set the initial state of the form fields with the details of the ticket
-    setFormData({
-      ...formData,
-      userAssigneeEmail: formData.assigneeEmail,      userTicketType: formData.ticketType,
-      userStatus: formData.status,      userPriority: formData.priority,
-    });  }
-  setShowUserComment(!showUserComment);};
+  const handleToggleUserComment = () => {
+    setShowUserComment(!showUserComment);
+  };
 
 
-
-  const handleUserCommentChange = (value) => {
-    setNewComment(value);
+  const handleUserCommentChange = (e) => {
+    setNewComment(e.target.value);
   };
 
   const handleUserSubmit = async (event) => {
     event.preventDefault();
-
+  
     // Check if the current user is the creator, assignee, or reassignee
     const isCreator = user.email === formData.email;
     const isAssignee = user.email === formData.assigneeEmail;
     const isReassignee = user.email === formData.userAssigneeEmail;
-
+  
     if (!isCreator && !isAssignee && !isReassignee) {
       setMessage('You are not authorized to comment on this ticket.');
       return;
@@ -170,12 +136,7 @@ const EditTicket = () => {
     }
   };
 
-  const stripHtmlTags = (htmlString) => {
-    const doc = new DOMParser().parseFromString(htmlString, 'text/html');
-    return doc.body.textContent || "";
-  };
-
-
+  
 
   const handleShowAttachmentModal = () => {
     setShowAttachmentModal(true);
@@ -271,54 +232,54 @@ const EditTicket = () => {
             />
           </div>
         </Col>
-        {/* Show Attachment Button */}
-        {formData.attachment && (
-          <Col>
-            <Button className="mt-3" onClick={handleShowAttachmentModal}>
-              <FontAwesomeIcon icon={faPaperclip} className="me-2" />
-              Show Attachment
-            </Button>
-          </Col>
-        )}
+          {/* Show Attachment Button */}
+      {formData.attachment && (
+        <Col>
+          <Button className="mt-3" onClick={handleShowAttachmentModal}>
+            <FontAwesomeIcon icon={faPaperclip} className="me-2" />
+            Show Attachment
+          </Button>
+        </Col>
+      )}
 
-        {/* Attachment Modal */}
-        <Modal show={showAttachmentModal} onHide={handleCloseAttachmentModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Attachment</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {/* Check if formData.attachment is defined before processing */}
-            {formData.attachment && (
-              <>
-                {/* Check if the attachment is an image */}
-                {formData.attachment.toLowerCase().endsWith('.png') ||
-                  formData.attachment.toLowerCase().endsWith('.jpg') ||
-                  formData.attachment.toLowerCase().endsWith('.jpeg') ||
-                  formData.attachment.toLowerCase().endsWith('.gif') ||
-                  formData.attachment.toLowerCase().endsWith('.bmp') ? (
-                  // If it's an image, display it in an img tag
-                  <img src={`https://localhost:7217/${formData.attachment.replace('wwwroot/', '')}`} alt="Attachment" className="img-fluid" />
-                ) : (
-                  // If it's not an image, provide a download button
-                  <div>
-                    <p>This is not an image file. You can download it below:</p>
-                    <a
-                      href={`https://localhost:7217/${formData.attachment.replace('wwwroot/', '')}`}
-                      download={formData.attachment}
-                    >
-                      <Button variant="primary">Download Attachment</Button>
-                    </a>
-                  </div>
-                )}
-              </>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseAttachmentModal}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
+      {/* Attachment Modal */}
+      <Modal show={showAttachmentModal} onHide={handleCloseAttachmentModal}>
+  <Modal.Header closeButton>
+    <Modal.Title>Attachment</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {/* Check if formData.attachment is defined before processing */}
+    {formData.attachment && (
+      <>
+        {/* Check if the attachment is an image */}
+        {formData.attachment.toLowerCase().endsWith('.png') ||
+          formData.attachment.toLowerCase().endsWith('.jpg') ||
+          formData.attachment.toLowerCase().endsWith('.jpeg') ||
+          formData.attachment.toLowerCase().endsWith('.gif') ||
+          formData.attachment.toLowerCase().endsWith('.bmp') ? (
+          // If it's an image, display it in an img tag
+          <img src={`https://localhost:7217/${formData.attachment.replace('wwwroot/', '')}`} alt="Attachment" className="img-fluid" />
+        ) : (
+          // If it's not an image, provide a download button
+          <div>
+            <p>This is not an image file. You can download it below:</p>
+            <a
+              href={`https://localhost:7217/${formData.attachment.replace('wwwroot/', '')}`}
+              download={formData.attachment}
+            >
+              <Button variant="primary">Download Attachment</Button>
+            </a>
+          </div>
+        )}
+      </>
+    )}
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={handleCloseAttachmentModal}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
       </Row>
 
       <h5 className="mt-3 d-flex align-items-center justify-content-between">
@@ -333,7 +294,7 @@ const EditTicket = () => {
         </div>
         <div>
           <Button onClick={toggleCollapse}>
-          {collapsed ? <i className="fa-solid fa-chevron-down"></i> : <i className="fa-solid fa-angle-up"></i>}
+            {collapsed ? 'Expand' : 'Collapse'}
           </Button>
         </div>
 
@@ -441,11 +402,13 @@ const EditTicket = () => {
                     Your Comment:
                   </label>
                   <div className="mb-3">
-                    {/* Use ReactQuill only for the user's comment */}
-                    <ReactQuill
+                    <textarea
+                      className="form-control"
+                      id="userComment"
+                      name="userComment"
                       value={newComment}
                       onChange={handleUserCommentChange}
-                      modules={{ toolbar: toolbarOptions }}
+                      rows="6"
                     />
                   </div>
                 </div>
@@ -529,13 +492,16 @@ const EditTicket = () => {
                     </label>
                   </div>
                   <div className="mb-3">
-                  <div dangerouslySetInnerHTML={{ __html: comment.comment }} />
-                    {/* Use dangerouslySetInnerHTML to render HTML tags */}
-    
+                    <textarea
+                      className="form-control"
+                      id="description"
+                      name="description"
+                      value={comment.comment}
+                      required
+                      rows="6"
+                      disabled
+                    />
                   </div>
-                  
-    
-  
                 </Col>
                 <Col md={5}>
                   <Form>
@@ -618,4 +584,3 @@ const EditTicket = () => {
 };
 
 export default EditTicket;
-

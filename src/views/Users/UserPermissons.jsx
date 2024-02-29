@@ -65,7 +65,7 @@ const PermissionPage = () => {
       // Transform permissions to the desired format
       const transformedPermissions = permissions.map(({ name, canview, canadd, canupdate, candelete }) => ({
         userID:parsedUserID,
-        Id: modules.find((mod) => mod.name === name).id, // Assuming there is a module ID associated with each name
+        id: modules.find((mod) => mod.name === name)?.id, // Assuming there is a module ID associated with each name
         canAddOnly: canadd,
         canDeleteOnly: candelete,
         canUpdateOnly: canupdate,

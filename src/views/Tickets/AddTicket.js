@@ -1,24 +1,16 @@
 import axios from "axios";
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from './../../context/UserContext';
-import {  Spinner } from 'react-bootstrap';
-// import { useNavigate } from "react-router-dom";
-
-
-
-const onClickViewTicket = () => {
-  window.location.href = './ViewAllTickets';
-}
+import { Spinner } from 'react-bootstrap';
+import { useNavigate } from "react-router-dom";
 
 const AddTicket = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { user } = useUser();
-  const [loading,setLoading]= useState(false)
-  const[ticketType,setTicketType]=useState([]);
-  const[Assignee,setAssignee]=useState([]);
- 
-  const initialFormData = {
-    ticketId: '0',
+  const [loading, setLoading] = useState(false);
+  const [ticketType, setTicketType] = useState([]);
+  const [Assignee, setAssignee] = useState([]);
+  const [formData, setFormData] = useState({
     email: user.email,
     priority: 'low',
     title: '',
@@ -28,13 +20,10 @@ const AddTicket = () => {
     projectType: '',
     dueDate: '',
     description: '',
-    assigneeEmail:'',
-  };
-
-
-  const [formData, setFormData] = useState(initialFormData);
+    assigneeEmail: '',
+    attachments: null
+  });
   const [message, setMessage] = useState(null);
-
 
   useEffect(() => {
     async function fetchAssignee() {
@@ -63,16 +52,15 @@ const AddTicket = () => {
   }, []);
 
   const handleInputChange = (e) => {
-    const { name, value, type } = e.target;
-    setFormData((prevData) => ({
+    const { name, value } = e.target;
+    setFormData(prevData => ({
       ...prevData,
-      [name]: type === 'file' ? e.target.files : value,
+      [name]: value
     }));
-    
-    // dept value
+
     if (name === 'assigneeEmail') {
-      const selectedAssignee = Assignee.find(assignee => assignee.email === value);   
-      if (selectedAssignee) {   
+      const selectedAssignee = Assignee.find(assignee => assignee.email === value);
+      if (selectedAssignee) {
         setFormData(prevData => ({
           ...prevData,
           department: selectedAssignee.departmentName,
@@ -83,24 +71,46 @@ const AddTicket = () => {
     }
   };
 
-  async function handleUserSubmit(event) {
+  const handleFileChange = (e) => {
+    setFormData(prevData => ({
+      ...prevData,
+      attachments: e.target.files
+    }));
+  };
+
+  const handleTicketSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    const currentDate = new Date().toISOString().split('T')[0];
-    
-    if (formData.dueDate < currentDate) {
-      setMessage('Due Date must be greater than or equal to the current date.');
-      return;
-    }
-  
+
+    const formattedParams = Object.entries(formData)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+
+    const formDataToSend = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === 'attachments') {
+        if (value) {
+          for (let i = 0; i < value.length; i++) {
+            formDataToSend.append('attachments', value[i]);
+          }
+        }
+      } else {
+        formDataToSend.append(key, value);
+      }
+    });
+
     try {
-      const res = await axios.post('https://localhost:7217/api/Tickets', formData);
+      const res = await axios.post(`https://localhost:7217/api/Tickets?${formattedParams}`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       console.log(res);
       setMessage('Ticket added successfully!');
       setLoading(false);
       setFormData({
-        ticketId: '0',
-        email: 'user.email',
+        email: user.email,
         priority: 'low',
         title: '',
         department: '',
@@ -110,25 +120,20 @@ const AddTicket = () => {
         dueDate: '',
         description: '',
         assigneeEmail: '',
+        attachments: null
       });
-      // navigate(`/Tickets/AddTicket/${res.data.userId}`);
+      navigate(`/Tickets/AddTicket/${res.data.userId}`);
     } catch (err) {
       console.error(err);
       setMessage('Error adding ticket. Please try again.');
       setLoading(false);
     }
-  }
-  
+  };
+
 
   return (
     <div className="container mt-5">
-      <div className='d-flex justify-content-between'>
-        <h4>Add Ticket</h4>
-
-        <button type="button" className="btn btn-primary mb-3 " onClick={onClickViewTicket}>
-          View Tickets
-        </button>
-      </div>
+      <div className='d-flex justify-content-between'></div>
 
       {message && (
         <div className={`alert ${message.includes('successfully') ? 'alert-success' : 'alert-danger'}`} role="alert">
@@ -136,7 +141,7 @@ const AddTicket = () => {
         </div>
       )}
 
-      <form onSubmit={handleUserSubmit}>
+      <form onSubmit={handleTicketSubmit}>
         {/* ticketId */}
         <div className="row mb-3">
           <label htmlFor="ticketId" className="col-sm-3 col-form-label text-end">
@@ -146,7 +151,8 @@ const AddTicket = () => {
             <input
               type="text"
               className="form-control"
-              id="ticketId"
+              id="
+ticketId"
               name="ticketId"
               placeholder="Ticket ID"
               required
@@ -158,7 +164,7 @@ const AddTicket = () => {
 
           {/* priority */}
           <label htmlFor="priority" className="col-sm-3 col-form-label text-end">
-          Priority<span className="text-danger">  * </span>
+            Priority<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <select
@@ -180,7 +186,7 @@ const AddTicket = () => {
         {/* title */}
         <div className="row mb-3">
           <label htmlFor="title" className="col-sm-3 col-form-label text-end">
-           Title<span className="text-danger">  * </span>
+            Title<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -195,10 +201,10 @@ const AddTicket = () => {
           </div>
           {/* department */}
           <label htmlFor="department" className="col-sm-3 col-form-label text-end">
-           Department<span className="text-danger">  * </span>
+            Department<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
-          <input
+            <input
               className="form-control"
               id="department"
               name="department"
@@ -206,7 +212,7 @@ const AddTicket = () => {
               required
               onChange={handleInputChange}
               disabled
-            > 
+            >
             </input>
           </div>
         </div>
@@ -214,14 +220,14 @@ const AddTicket = () => {
         {/* Ticket Type */}
         <div className="row mb-3">
           <label htmlFor="ticketType" className="col-sm-3 col-form-label text-end">
-          Ticket Type<span className="text-danger">  * </span>
+            Ticket Type<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
-          <select
+            <select
               className="form-select"
               id="ticketType"
               name="ticketType"
-             
+
               required
               onChange={handleInputChange}
             >
@@ -233,18 +239,18 @@ const AddTicket = () => {
           </div>
           {/* status */}
           <label htmlFor="status" className="col-sm-3 col-form-label text-end">
-          Status<span className="text-danger">  * </span>
+            Status<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <select
               className="form-select"
               id="status"
               name="status"
-              
+
               required
               onChange={handleInputChange}
             >
-               <option defaultValue>Select Status</option>
+              <option defaultValue>Select Status</option>
               <option value="Active">Active</option>
               <option value="Pending">Pending</option>
               <option value="Unassigned">Unassigned</option>
@@ -256,7 +262,7 @@ const AddTicket = () => {
         {/* Creator ID */}
         <div className="row mb-3">
           <label htmlFor="email" className="col-sm-3 col-form-label text-end">
-           Creator<span className="text-danger">  * </span>
+            Creator<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -272,18 +278,16 @@ const AddTicket = () => {
             />
           </div>
 
-
-
           {/* Assigned To */}
           <label htmlFor="assigneeEmail" className="col-sm-3 col-form-label text-end">
-           Assignee Email<span className="text-danger">  * </span>
+            Assignee Email<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
-          <select
+            <select
               className="form-select"
               id="assigneeEmail"
               name="assigneeEmail"
-              
+
               required
               onChange={handleInputChange}
             >
@@ -292,13 +296,13 @@ const AddTicket = () => {
                 <option key={Setas.id} value={Setas.email}>{Setas.email}</option>
               ))}
             </select>
-            
+
           </div>
         </div>
         {/* Project Type */}
         <div className="row mb-3">
           <label htmlFor="projectType" className="col-sm-3 col-form-label text-end">
-           Project Type<span className="text-danger">  * </span>
+            Project Type<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -314,7 +318,7 @@ const AddTicket = () => {
 
           {/* Due Date */}
           <label htmlFor="dueDate" className="col-sm-3 col-form-label text-end">
-           Due Date<span className="text-danger">  * </span>
+            Due Date<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -333,7 +337,7 @@ const AddTicket = () => {
         {/* description */}
         <div className="row mb-3">
           <label htmlFor="description" className="col-sm-3 col-form-label text-end">
-           Description<span className="text-danger">  * </span>
+            Description<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-9">
             <textarea
@@ -348,7 +352,6 @@ const AddTicket = () => {
           </div>
         </div>
 
-        {/* Attachments */}
         <div className="row mb-3">
           <label htmlFor="attachments" className="col-sm-3 col-form-label text-end">
             Attachments:
@@ -360,25 +363,24 @@ const AddTicket = () => {
               id="attachments"
               name="attachments"
               multiple
-              onChange={handleInputChange}
+              onChange={handleFileChange}
             />
-
           </div>
-
-
         </div>
 
         <div className="row mb-3">
           <div className="col-sm-3"></div>
           <div className="col-sm-9 text-end">
             <button type="submit" className="btn btn-primary" disabled={loading}>
-               {loading? <><Spinner animation="border" size='sm' /> Adding Ticket...</>:"Add Ticket"}
+              {loading ? <><Spinner animation="border" size='sm' /> Adding Ticket...</> : "Add Ticket"}
             </button>
           </div>
         </div>
       </form>
     </div>
+
   );
 };
+
 
 export default AddTicket;

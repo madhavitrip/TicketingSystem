@@ -18,8 +18,6 @@ const Department = () => {
     const [ticketType, setTicketTypes] = useState([]);
     const [newTicketType, setNewTicketType] = useState('')
     const [openTicketType, setOpenTicketType] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [editItem, setEditItem] = useState(null);
 
     // Fetch departments from the API when the component mounts 
     useEffect(() => {
@@ -48,106 +46,6 @@ const Department = () => {
 
         fetchRoles();
     }, []);
-
-    const handleSearch = (e) => {
-        setSearchQuery(e.target.value);
-    };
-
-
-    const handleEdit = (item) => {
-        console.log('Edit item:', item);
-        setEditItem(item);
-    };
-    
-
-    const handleEditSubmit = async (e, id, updatedValue) => {
-        e.preventDefault();
-        try {
-            await axios.put(`https://localhost:7217/api/Departments/${id}`, {
-                id:id,
-                departmentName : updatedValue,
-            });
-
-            setDepartments((prevDepartments) =>
-                prevDepartments.map((dept) =>
-                    dept.id === id ? { ...dept, departmentName: updatedValue } : dept
-                )
-            );
-
-            setEditItem(null);
-            setNewDepartment(''); // Reset newDepartment state after submitting
-        } catch (error) {
-            console.error('Error updating item:', error);
-        }
-    };
-
-    const handleEditSubmitRole = async (e, id, updatedValue) => {
-        e.preventDefault();
-        try {
-            await axios.put(`https://localhost:7217/api/Roles/${id}`, {
-                roleId: id,
-                role: updatedValue,
-            });
-    
-            setRoles((prevRoles) =>
-                prevRoles.map((role) =>
-                    role.roleId === id ? { ...role, role: updatedValue } : role
-                )
-            );
-    
-            setEditItem(null);
-            setNewRoles(''); // Reset newRoles state after submitting
-        } catch (error) {
-            console.error('Error updating role:', error);
-        }
-    };
-    
-    // Similar functions for TicketTypes and Projects
-    
-    const handleEditSubmitTicketType = async (e, id, updatedValue) => {
-        e.preventDefault();
-        try {
-            await axios.put(`https://localhost:7217/api/TicketTypes/${id}`, {
-                id: id,
-                ticketType: updatedValue,
-            });
-    
-            setTicketTypes((prevTicketTypes) =>
-                prevTicketTypes.map((ticket) =>
-                    ticket.id === id ? { ...ticket, ticketType: updatedValue } : ticket
-                )
-            );
-    
-            setEditItem(null);
-            setNewTicketType(''); // Reset newTicketType state after submitting
-        } catch (error) {
-            console.error('Error updating ticket type:', error);
-        }
-    };
-    
-    const handleEditSubmitProject = async (e, id, updatedValue) => {
-        e.preventDefault();
-        try {
-            await axios.put(`https://localhost:7217/api/ProjectType/${id}`, {
-                id: id,
-                projectTypes: updatedValue,
-            });
-    
-            setProject((prevProjects) =>
-                prevProjects.map((project) =>
-                    project.id === id ? { ...project, projectTypes: updatedValue } : project
-                )
-            );
-    
-            setEditItem(null);
-            setNewProject(''); // Reset newProject state after submitting
-        } catch (error) {
-            console.error('Error updating project:', error);
-        }
-    };
-    
-
-
 
     // Fetch projects from the API when the component mounts 
     useEffect(() => {
@@ -200,7 +98,7 @@ const Department = () => {
             try {
                 // Send a POST request to create a new department 
                 const response = await axios.post('https://localhost:7217/api/Roles', {
-                    role: newRoles,
+                    roleName: newRoles,
                 });
 
                 // Update the state with the new department from the server response 
@@ -217,7 +115,7 @@ const Department = () => {
             try {
                 // Send a POST request to create a new department 
                 const response = await axios.post('https://localhost:7217/api/ProjectType', {
-                    projectTypes: newProject,
+                    name: newProject,
                 });
 
                 // Update the state with the new department from the server response 
@@ -251,21 +149,7 @@ const Department = () => {
             <Row>
                 {/* Department List */}
                 <Col md={12}>
-                    <div className='row mb-3 justify-content-between display flex'>
-
-                        <h4 className='col-sm-3'>Categories</h4>
-                        <Form className='col-sm-3'>
-                            <Form.Control
-                                type="text"
-                                placeholder="Search"
-                                value={searchQuery}
-                                onChange={handleSearch}
-                            />
-                        </Form>
-
-                    
-                    </div>
-                    
+                    <h4>Categories</h4>
                     <Nav justify variant="tabs" defaultActiveKey="departments">
                         <Nav.Item>
                             <Nav.Link eventKey="departments" onClick={() => setActiveTab('departments')}>Departments</Nav.Link>
@@ -289,46 +173,20 @@ const Department = () => {
                             <Row>
                                 <Col md={6}>
                                     <h4>Departments</h4>
-
-
                                     <ListGroup>
                                         <ul className="responsive-table">
                                             <li className="table-header mt-3">
                                                 <div className="col col-1">SNo.</div>
                                                 <div className="col col-2">Department</div>
-                                                <div className="col col-3">Actions</div>
                                             </li>
-                                            {departments
-                                                .filter((dept) =>
-                                                    dept.departmentName.toLowerCase().includes(searchQuery.toLowerCase())
-                                                )
-                                                .map((dept) => (
-                                                    <ListGroup.Item key={dept.id}>
-                                                        <li className="table-row mt-1">
-                                                            <div className="col col-1" data-label="SNo.">{dept.id}</div>
-                                                            <div className="col col-2" data-label="Department">{dept.departmentName}</div>
-                                                            <div className="col col-3" data-label="Actions">
-                                                                {editItem && editItem.id === dept.id ? (
-                                                                    <Form onSubmit={(e) => handleEditSubmit(e, dept.id, newDepartment)}>
-                                                                        <input
-                                                                            className="form-control"
-                                                                            type="text"
-                                                                            value={newDepartment}
-                                                                            onChange={(e) => setNewDepartment(e.target.value)}
-                                                                        />
-                                                                        <Button type="submit" variant="success" size="sm">
-                                                                            Save
-                                                                        </Button>
-                                                                    </Form>
-                                                                ) : (
-                                                                    <Button variant="outline-primary" size="sm" onClick={() => handleEdit(dept)}>
-                                                                        Edit
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                        </li>
-                                                    </ListGroup.Item>
-                                                ))}
+                                            {departments.map((dept) => (
+                                                <ListGroup.Item key={dept.id}>
+                                                    <li className="table-row mt-1">
+                                                        <div className="col col-1" data-label="SNo.">{dept.id}</div>
+                                                        <div className="col col-2" data-label="Department">{dept.departmentName}</div>
+                                                    </li>
+                                                </ListGroup.Item>
+                                            ))}
                                         </ul>
                                     </ListGroup>
                                 </Col>
@@ -393,39 +251,15 @@ const Department = () => {
                                             <li className="table-header mt-3">
                                                 <div className="col col-1">SNo.</div>
                                                 <div className="col col-2">Roles</div>
-                                                <div className="col col-3">Actions</div>
                                             </li>
-                                            {roles
-                                                .filter((role) =>
-                                                    role.role.toLowerCase().includes(searchQuery.toLowerCase())
-                                                )
-                                                .map((role) => (
-                                                    <ListGroup.Item key={role.roleId}>
-                                                        <li className="table-row mt-1">
-                                                            <div className="col col-1" data-label="SNo.">{role.roleId}</div>
-                                                            <div className="col col-2" data-label="Roles">{role.role}</div>
-                                                            <div className="col col-3" data-label="Actions">
-                                                            {editItem && editItem.roleId === role.roleId ? (
-                                                                    <Form onSubmit={(e) => handleEditSubmitRole(e, role.roleId, newRoles)}>
-                                                                        <input
-                                                                            className="form-control"
-                                                                            type="text"
-                                                                            value={newRoles}
-                                                                            onChange={(e) => setNewRoles(e.target.value)}
-                                                                        />
-                                                                        <Button type="submit" variant="success" size="sm">
-                                                                            Save
-                                                                        </Button>
-                                                                    </Form>
-                                                                ) : (
-                                                                    <Button variant="outline-primary" size="sm" onClick={() => handleEdit(role)}>
-                                                                        Edit
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                        </li>
-                                                    </ListGroup.Item>
-                                                ))}
+                                            {roles.map((role) => (
+                                                <ListGroup.Item key={role.roleId}>
+                                                    <li className="table-row mt-1">
+                                                        <div className="col col-1" data-label="SNo.">{role.roleId}</div>
+                                                        <div className="col col-2" data-label="Roles">{role.role}</div>
+                                                    </li>
+                                                </ListGroup.Item>
+                                            ))}
                                         </ul>
                                     </ListGroup>
                                 </Col>
@@ -488,39 +322,15 @@ const Department = () => {
                                             <li className="table-header mt-3">
                                                 <div className="col col-1">SNo.</div>
                                                 <div className="col col-2">Projects</div>
-                                                <div className="col col-3">Actions</div>
                                             </li>
-                                            {project
-                                                .filter((project) =>
-                                                    project.projectTypes.toLowerCase().includes(searchQuery.toLowerCase())
-                                                )
-                                                .map((project) => (
-                                                    <ListGroup.Item key={project.id}>
-                                                        <li className="table-row mt-1">
-                                                            <div className="col col-1" data-label="SNo.">{project.id}</div>
-                                                            <div className="col col-2" data-label="Project">{project.projectTypes}</div>
-                                                            <div className="col col-3" data-label="Actions">
-                                                            {editItem && editItem.id === project.id ? (
-                                                                    <Form onSubmit={(e) => handleEditSubmitProject(e, project.id, newProject)}>
-                                                                        <input
-                                                                            className="form-control"
-                                                                            type="text"
-                                                                            value={newProject}
-                                                                            onChange={(e) => setNewProject(e.target.value)}
-                                                                        />
-                                                                        <Button type="submit" variant="success" size="sm">
-                                                                            Save
-                                                                        </Button>
-                                                                    </Form>
-                                                                ) : (
-                                                                    <Button variant="outline-primary" size="sm" onClick={() => handleEdit(project)}>
-                                                                        Edit
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                        </li>
-                                                    </ListGroup.Item>
-                                                ))}
+                                            {project.map((project) => (
+                                                <ListGroup.Item key={project.id}>
+                                                    <li className="table-row mt-1">
+                                                        <div className="col col-1" data-label="SNo.">{project.id}</div>
+                                                        <div className="col col-2" data-label="Project">{project.projectTypes}</div>
+                                                    </li>
+                                                </ListGroup.Item>
+                                            ))}
                                         </ul>
                                     </ListGroup>
                                 </Col>
@@ -588,39 +398,16 @@ const Department = () => {
                                                         <li className="table-header mt-3">
                                                             <div className="col col-1">SNo.</div>
                                                             <div className="col col-2">TicketType</div>
-                                                            <div className="col col-3">Actions</div>
+
                                                         </li>
-                                                        {ticketType
-                                                            .filter((ticket) =>
-                                                                ticket.ticketType.toLowerCase().includes(searchQuery.toLowerCase())
-                                                            )
-                                                            .map((ticket) => (
-                                                                <ListGroup.Item key={ticket.id}>
-                                                                    <li className="table-row mt-1">
-                                                                        <div className="col col-1" data-label="SNo.">{ticket.id}</div>
-                                                                        <div className="col col-2" data-label="TicketType">{ticket.ticketType}</div>
-                                                                        <div className="col col-3" data-label="Actions">
-                                                                        {editItem && editItem.id === ticket.id ? (
-                                                                    <Form onSubmit={(e) => handleEditSubmitTicketType(e, ticket.id, newTicketType)}>
-                                                                        <input
-                                                                            className="form-control"
-                                                                            type="text"
-                                                                            value={newTicketType}
-                                                                            onChange={(e) => setNewTicketType(e.target.value)}
-                                                                        />
-                                                                        <Button type="submit" variant="success" size="sm">
-                                                                            Save
-                                                                        </Button>
-                                                                    </Form>
-                                                                ) : (
-                                                                    <Button variant="outline-primary" size="sm" onClick={() => handleEdit(ticket)}>
-                                                                        Edit
-                                                                    </Button>
-                                                                )}
-                                                                        </div>
-                                                                    </li>
-                                                                </ListGroup.Item>
-                                                            ))}
+                                                        {ticketType.map((ticket) => (
+                                                            <ListGroup.Item key={ticket.id}>
+                                                                <li className="table-row mt-1">
+                                                                    <div className="col col-1" data-label="SNo.">{ticket.id}</div>
+                                                                    <div className="col col-2" data-label="TicketType">{ticket.ticketType}</div>
+                                                                </li>
+                                                            </ListGroup.Item>
+                                                        ))}
                                                     </ul>
                                                 </ListGroup>
                                             )
@@ -716,7 +503,7 @@ const Department = () => {
 
 
             </Row>
-        </Container >
+        </Container>
     );
 };
 
