@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { Col, Container, Row, Spinner } from 'react-bootstrap'
 import DashboardTable from './DashboardTable';
 import { useUser } from './../../context/UserContext';
@@ -15,6 +15,12 @@ const Dashboard = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
+  const handleUpdateStatus = useCallback((updatedTickets) => {
+    // Update the state with the modified tickets
+    setTickets(updatedTickets);
+  }, []);
+
   useEffect(() => {
     const fetchCountsAndTickets = async () => {
       try {
@@ -27,21 +33,21 @@ const Dashboard = () => {
           unassigned: countsData.unassignedCount,
           completed: countsData.completedCount
         });
-
+  
         // Fetch tickets
         const ticketsResponse = await fetch(`https://localhost:7217/api/Tickets/ByUser?email=${user.email}`);
         const ticketsData = await ticketsResponse.json();
         setTickets(ticketsData);
-
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
         setLoading(false);
       }
     };
-
+  
     fetchCountsAndTickets();
-  }, [user]);
+  }, [user, setCounts, setTickets]); // Include setCounts and setTickets in the dependency array
+  
 
   return ( 
     <div> 
@@ -108,7 +114,7 @@ const Dashboard = () => {
         </div> 
       ) : ( 
  
-        <DashboardTable tickets={tickets} /> 
+        <DashboardTable tickets={tickets} onUpdateStatus={handleUpdateStatus} />
       ) 
       } 
     </div> 

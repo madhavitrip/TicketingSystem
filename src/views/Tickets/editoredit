@@ -91,22 +91,6 @@ const EditTicket = () => {
     setCurrentDateTime(new Date().toLocaleString());
   }, [ticketId]);
 
-
-  useEffect(() => {
-    // Check if the due date has passed
-    const isDueDatePassed = new Date(formData.dueDate) < new Date();
-
-    // Check if the status is not already "Completed"
-    const isNotCompleted = formData.status !== 'Completed';
-
-    // Update status to "Pending" if due date is exceeded and status is not "Completed"
-    if (isDueDatePassed && isNotCompleted) {
-      setFormData((prevData) => ({
-        ...prevData,
-        status: 'Pending',
-      }));
-    }
-  }, [formData.dueDate, formData.status]);
   // Function to sort comments by timestamp in descending order (newest first) 
   const sortCommentsByTimestampDesc = () => {
     const sortedComments = [...comments].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));

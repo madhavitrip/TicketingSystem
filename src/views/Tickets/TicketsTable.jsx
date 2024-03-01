@@ -13,6 +13,19 @@ const TicketsTable = ({ tickets, hasPermission }) => {
   const [modalShow, setModalShow] = useState(false); 
   const [selectedTicket, setSelectedTicket] = useState(null); 
   const tableRef = useRef(null); 
+
+  useEffect(() => {
+    tickets.forEach((ticket) => {
+      const isDueDatePassed = new Date(ticket.dueDate) < new Date();
+      const isNotCompleted = ticket.status !== 'Completed';
+
+      if (isDueDatePassed && isNotCompleted) {
+        // Update status to "Pending"
+        // Consider using a function to update the status in your state or API
+        console.log(`Ticket ${ticket.ticketId} status is automatically updated to "Pending"`);
+      }
+    });
+  }, [tickets]);
  
   useEffect(() => { 
     $(tableRef.current).DataTable(); 

@@ -1,15 +1,48 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef,useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import $ from 'jquery';
 
 
 
-const DashboardTable = ({ tickets }) => {
+
+const DashboardTable = ({ tickets,onUpdateStatus }) => {
   const tableRef = useRef(null)
+  
+
+  const handleUpdateStatus = useCallback(
+    (updatedTickets) => {
+      onUpdateStatus(updatedTickets);
+    },
+    [onUpdateStatus]
+  );
+  
+
+ 
+   
+
   useEffect(() => {
+
     $(tableRef.current).DataTable();
-  }, []);
+    // Update status to "Pending" if due date is exceeded
+    const updatedTickets = tickets.map((ticket) => {
+      const isDueDatePassed = new Date(ticket.dueDate) < new Date();
+      const isNotCompleted = ticket.status !== 'Completed';
+  
+      if (isDueDatePassed && isNotCompleted) {
+        // You may want to update the status in your data source here
+        return { ...ticket, status: 'Pending' };
+      }
+  
+      return ticket;
+    });
+  
+    // Call handleUpdateStatus only if there are updates
+    if (JSON.stringify(updatedTickets) !== JSON.stringify(tickets)) {
+      handleUpdateStatus(updatedTickets);
+    }
+  }, [tickets, handleUpdateStatus]);
+
 
   if (!Array.isArray(tickets)) {
     return <div>No tickets available</div>;
@@ -71,6 +104,7 @@ DashboardTable.propTypes = {
       assigneeEmail: PropTypes.string.isRequired,
     })
   ).isRequired,
+  onUpdateStatus: PropTypes.func.isRequired,
 };
 
 export default DashboardTable;

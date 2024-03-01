@@ -9,6 +9,7 @@ const AddTicket = () => {
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [ticketType, setTicketType] = useState([]);
+  const [projectType,setProjectType] = useState([]);
   const [Assignee, setAssignee] = useState([]);
   const [formData, setFormData] = useState({
     email: user.email,
@@ -49,6 +50,19 @@ const AddTicket = () => {
     }
 
     fetchTickettype();
+  }, []);
+
+  useEffect(() => {
+    async function fetchProjecttype() {
+      try {
+        const response = await axios.get('https://localhost:7217/api/ProjectType');
+        setProjectType(response.data);
+      } catch (error) {
+        console.error('Error fetching Project Type:', error);
+      }
+    }
+
+    fetchProjecttype();
   }, []);
 
   const handleInputChange = (e) => {
@@ -151,8 +165,8 @@ const AddTicket = () => {
             <input
               type="text"
               className="form-control"
-              id="
-ticketId"
+              id="ticketId"
+
               name="ticketId"
               placeholder="Ticket ID"
               required
@@ -242,20 +256,16 @@ ticketId"
             Status<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
-            <select
+            <input
               className="form-select"
               id="status"
               name="status"
-
+              value= "Active"
               required
               onChange={handleInputChange}
-            >
-              <option defaultValue>Select Status</option>
-              <option value="Active">Active</option>
-              <option value="Pending">Pending</option>
-              <option value="Unassigned">Unassigned</option>
-              <option value="Completed">Completed</option>
-            </select>
+              disabled
+            />
+
           </div>
         </div>
 
@@ -305,15 +315,19 @@ ticketId"
             Project Type<span className="text-danger">  * </span>
           </label>
           <div className="col-sm-3">
-            <input
-              type="text"
+          <select
               className="form-control"
               id="projectType"
               name="projectType"
-              placeholder="Enter Project Type"
+
               required
               onChange={handleInputChange}
-            />
+            >
+              <option value="">Select Project Type</option>
+              {projectType.map(pt => (
+                <option key={pt.id} value={pt.projectTypes}>{pt.projectTypes}</option>
+              ))}
+            </select>
           </div>
 
           {/* Due Date */}

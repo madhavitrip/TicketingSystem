@@ -2,13 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Table, Form, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import './AddUser'; 
+import { Alert } from '@coreui/coreui';
 
 const PermissionPage = () => {
   const { userID } = useParams();
   const parsedUserID = parseInt(userID, 10);
   const [permissions, setPermissions] = useState([]);
   const [modules, setModules] = useState([]);
+  const [user, setUser] = useState({});
+  const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    // Fetch user details
+    const fetchUserDetails = async () => {
+      try {
+        const response = await axios.get(`https://localhost:7217/api/Users/${userID}`);
+        setUser(response.data);
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+    fetchUserDetails();
+  }, [userID]);
 
   useEffect(() => {
     // Fetch user's existing permissions
@@ -76,6 +94,10 @@ const PermissionPage = () => {
       .then(response => {
         // Handle success, e.g., show a success message
         console.log('Permissions added successfully:', response.data);
+        setSuccessMessage('Permissions added successfully');
+
+        // Redirect to the permissions page for the user
+        navigate(`/permissions/${userID}`);
       })
       .catch(error => {
         // Handle error, e.g., show an error message
@@ -88,7 +110,7 @@ const PermissionPage = () => {
       <Row className="justify-content-center mt-5">
         <Col md={8}>
           <Card>
-            <Card.Header as="h5" className="text-center">Module Permissions</Card.Header>
+            <Card.Header as="h5" className="text-center">Module Permissions of {user.firstName}</Card.Header>
             <Card.Body>
               <Form>
                 <Table bordered>
@@ -167,6 +189,7 @@ const PermissionPage = () => {
                 <Button variant="primary" onClick={handleAddPermission}>
                   Add Permission
                 </Button>
+                {successMessage && <Alert variant= "success" className="mt-3">{successMessage}</Alert>}
               </div>
             </Card.Body>
           </Card>
