@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle } from '@coreui/react';
 import {cilEnvelopeOpen} from '@coreui/icons';
 import { useUser } from './../../context/UserContext';
+import axios from "axios";
 
 const Notification = () => {
   const{user}=useUser();
   // State to store the new ticket count
   const [newTicketsCount, setNewTicketsCount] = useState(0);
+
 
   // Function to fetch the new ticket count from the backend
   const fetchNewTicketsCount = async () => {
@@ -18,6 +20,7 @@ const Notification = () => {
       console.error('Error fetching new tickets count:', error);
     }
   };
+
 
   // useEffect hook to fetch the new ticket count initially and start polling for updates
   useEffect(() => {
@@ -31,6 +34,9 @@ const Notification = () => {
   }, []);
 
   return (
+
+    
+
     <CDropdown inNav className="c-header-nav-item mx-2" direction="down">
       <CDropdownToggle className="c-header-nav-link" caret={false}>
         <div className="c-icon">
@@ -42,6 +48,7 @@ const Notification = () => {
         {/* Dropdown items */}
       </CDropdownMenu>
     </CDropdown>
+  
   );
 };
 export default Notification;

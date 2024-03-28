@@ -1,30 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import UserTable from './UserTable';
-import { Link } from 'react-router-dom';
-import { Container, Button, Modal } from 'react-bootstrap';
+import { useNavigate } from "react-router-dom";
+import { Container, Button } from 'react-bootstrap';
 import PermissionChecker from './../../context/PermissionChecker';
-import AddUser from './AddUser';
 
+const userapi= process.env.REACT_APP_API_USERS;
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
-  const [showModal, setShowModal] = useState(false); // State for managing modal visibility
 
-  const handleClose = () => setShowModal(false);
-  const handleShow = () => setShowModal(true);
-
+  let navigate = useNavigate();
   const OnClickAddUser = () => {
     // Show the modal when clicking the "Add User" button
-    handleShow();
+    let path = `/Users/AddUser`; 
+    navigate(path);
   };
 
   useEffect(() => {
     // Fetch user data from the API
-    fetch('https://localhost:7217/api/Users')
+    fetch(userapi)
       .then((res) => res.json())
       .then((data) => {
         // Map properties to match UserTable expectations
         const mappedUsers = data.map((user) => ({
           userId: user.userId,
+          profilePicturePath: user.profilePicturePath,
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
           mobileNo: user.mobileNo,
@@ -56,23 +55,7 @@ const AllUsers = () => {
                   Add User
                 </Button>
 
-                {/* Modal */}
-                <Modal show={showModal} onHide={handleClose} className='space-y-6'>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Add User</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <AddUser />
-                  </Modal.Body>
-                  <Modal.Footer>
-                    {/* <Button variant="secondary" onClick={handleClose}>
-                      Close
-                    </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                      Save Changes
-                    </Button> */}
-                  </Modal.Footer>
-                </Modal>
+                
               </>
             )}
           </div>

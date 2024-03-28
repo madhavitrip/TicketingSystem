@@ -1,8 +1,28 @@
 .bgimg{
-    background: url('./../../../assets/images/lgbg.jpg');
+    background: url('./../../../assets/images/loginicon.png');
     background-size: cover;
-    background-position: bottom;
+    background-position: center;
     background-repeat: no-repeat;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    
+}
+.bgimgchangepass{
+    background: url('./../../../assets/images/Reset\ password-pana.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    
+}
+.bgimgforgotpass{
+    background: url('./../../../assets/images/Forgot\ password-cuate.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
     
 }
 .log{

@@ -1,4 +1,4 @@
-import React from 'react'
+import React , { useState, useEffect }from 'react'
 import { CCard, CCardBody, CCol, CCardHeader, CRow } from '@coreui/react'
 import {
   CChartBar,
@@ -9,13 +9,56 @@ import {
   CChartRadar,
 } from '@coreui/react-chartjs'
 import { DocsCallout } from 'src/components'
+import { useUser } from './../../context/UserContext'
+
+const Tickets = process.env.REACT_APP_API_TICKET;
 
 const Charts = () => {
   const random = () => Math.round(Math.random() * 100)
+  const {user} = useUser();
+  const [counts, setCounts] = useState({
+    open: 0,
+    pending: 0,
+    selfassigned: 0,
+    completed: 0
+  });
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    
+    const fetchCountsAndTickets = async () => {
+      try {
+        // Fetch counts
+        const countsResponse = await fetch(`${Tickets}/status-count?email=${user.email}`);
+        const countsData = await countsResponse.json();
+        setCounts({
+          open: countsData.openCount,
+          pending: countsData.pendingCount,
+          selfassigned: countsData.selfassignedCount,
+          completed: countsData.completedCount
+        });
+  
+        // Fetch tickets
+        const ticketsResponse = await fetch(`${Tickets}/ByUser?email=${user.email}`);
+        const ticketsData = await ticketsResponse.json();
+        setTickets(ticketsData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchCountsAndTickets();
+  }, [user]); // Include setCounts and setTickets in the dependency array
+
+
 
   return (
     <CRow>
-      <CCol xs={12}>
+      {/* <CCol xs={12}>
         <DocsCallout
           name="Chart"
           href="components/chart"
@@ -89,19 +132,20 @@ const Charts = () => {
             />
           </CCardBody>
         </CCard>
-      </CCol>
-      <CCol xs={6}>
-        <CCard className="mb-4">
-          <CCardHeader>Pie Chart</CCardHeader>
+      </CCol> */}
+      <CCol xs={12} className='d-flex align-items-center justify-content-center'>
+        <CCard className="mb-4 " style={{height: '370px', }}  >
+          {/* <CCardHeader>Pie Chart</CCardHeader> */}
+          
           <CCardBody>
             <CChartPie
               data={{
-                labels: ['Red', 'Green', 'Yellow'],
+                labels: ['Open', 'Pending', 'Self-Assigned', 'Completed'],
                 datasets: [
                   {
-                    data: [300, 50, 100],
-                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                    data: [counts.open, counts.pending, counts.selfassigned, counts.completed],
+                    backgroundColor: [ '#08683A','#36A2EB', '#FFFF33', '#F77000'],
+                    hoverBackgroundColor: ['#08683A', '#36A2EB', '#FFFF33', '#F77000'],
                   },
                 ],
               }}
@@ -109,17 +153,18 @@ const Charts = () => {
           </CCardBody>
         </CCard>
       </CCol>
-      <CCol xs={6}>
+      {/* <CCol xs={6}>
         <CCard className="mb-4">
           <CCardHeader>Polar Area Chart</CCardHeader>
           <CCardBody>
             <CChartPolarArea
               data={{
-                labels: ['Red', 'Green', 'Yellow', 'Grey', 'Blue'],
+                labels: ['Active', 'Pending', 'Self-Assigned', 'Completed'],
                 datasets: [
                   {
-                    data: [11, 16, 7, 3, 14],
-                    backgroundColor: ['#FF6384', '#4BC0C0', '#FFCE56', '#E7E9ED', '#36A2EB'],
+                    data: [counts.active, counts.pending, counts.selfassigned, counts.completed],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
                   },
                 ],
               }}
@@ -168,7 +213,7 @@ const Charts = () => {
             />
           </CCardBody>
         </CCard>
-      </CCol>
+      </CCol> */}
     </CRow>
   )
 }

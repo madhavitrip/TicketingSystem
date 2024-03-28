@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { useSecurity } from './../../context/Security';
+
+const userapi= process.env.REACT_APP_API_USERS;
 
 const EditUser = () => {
     const [message, setMessage] = useState(null);
     const { userId } = useParams();
+    const {decrypt} = useSecurity(); 
+  const decryptid = decrypt(userId);
     const [formData, setFormData] = useState({
         
         firstName: '',
@@ -20,7 +25,7 @@ const EditUser = () => {
     });
 
     useEffect(() => {
-        axios.get(`https://localhost:7217/api/Users/${userId}`)
+        axios.get(`${userapi}/${decryptid}`)
             .then(res => {
                 setFormData(res.data);
                 console.log(res.data)
@@ -29,7 +34,7 @@ const EditUser = () => {
                 console.log(err);
                 setMessage('Error updating user. Please try again.');
             });
-    }, [userId]);
+    }, [decryptid]);
 
     const handleInputChange = (e) => {
         const { name, value, type } = e.target;
@@ -41,13 +46,7 @@ const EditUser = () => {
 
     function handleUserSubmit(event) {
         event.preventDefault();
-        // const currentDate = new Date().toISOString().split('T')[0];
-        // if (formData.dueDate < currentDate) {
-        //     setMessage('Due Date must be greater than or equal to the current date.');
-        //     return;
-        // }
-
-        axios.put(`https://localhost:7217/api/Users/${userId}`, formData)
+        axios.put(`${userapi}/${decryptid}`, formData)
             .then(res => {
                 console.log(res);
                 setMessage('User updated successfully!');
@@ -60,7 +59,7 @@ const EditUser = () => {
 
     return (
         <div className="container mt-5">
-            <h4>Edit User</h4>
+            <h4 className='mb-3'>Edit the Details of {formData.firstName}</h4>
 
             {message && (
                 <div className={`alert ${message.includes('successfully') ? 'alert-success' : 'alert-danger'}`} role="alert">
@@ -84,6 +83,7 @@ const EditUser = () => {
                             required
                             onChange={handleInputChange}
                             value={formData.firstName}
+                            disabled
                         />
                     </div>
 
@@ -101,25 +101,28 @@ const EditUser = () => {
                             required
                             onChange={handleInputChange}
                             value={formData.lastName}
+                            disabled
                         />
                     </div>
-
-                    {/* Mobile Number */}
-                    <label htmlFor="mobileNo" className="col-sm-1 col-form-label text-start">
-                        MobileNo:
+                    {/* Date of Birth */}
+                    <label htmlFor="dateOfBirth" className="col-sm-1 col-form-label text-end">
+                        DOB:
                     </label>
                     <div className="col-sm-3">
                         <input
-                            type="text"
+                            type="date"
                             className="form-control"
-                            id="mobileNo"
-                            name="mobileNo"
-                            placeholder="Enter Mobile No."
+                            id="dateOfBirth"
+                            name="dateOfBirth"
+                            placeholder="Enter Date Of Birth"
                             required
                             onChange={handleInputChange}
-                            value={formData.mobileNo}
+                            value={formData.dateOfBirth}
+                            disabled
                         />
                     </div>
+
+                    
 
                 </div>
 
@@ -141,22 +144,24 @@ const EditUser = () => {
                         />
                     </div>
 
-                    {/* Date of Birth */}
-                    <label htmlFor="dateOfBirth" className="col-sm-1 col-form-label text-end">
-                        DOB:
+                    
+                    {/* Mobile Number */}
+                    <label htmlFor="mobileNo" className="col-sm-1 col-form-label text-start">
+                        MobileNo:
                     </label>
                     <div className="col-sm-3">
                         <input
-                            type="date"
+                            type="text"
                             className="form-control"
-                            id="dateOfBirth"
-                            name="dateOfBirth"
-                            placeholder="Enter Date Of Birth"
+                            id="mobileNo"
+                            name="mobileNo"
+                            placeholder="Enter Mobile No."
                             required
                             onChange={handleInputChange}
-                            value={formData.dateOfBirth}
+                            value={formData.mobileNo}
                         />
                     </div>
+                    
                     {/* Email */}
                     <label htmlFor="email" className="col-sm-1 col-form-label text-end">
                         Email:
@@ -171,6 +176,7 @@ const EditUser = () => {
                             required
                             onChange={handleInputChange}
                             value={formData.email}
+                            disabled
                         />
                     </div>
                 </div>
@@ -226,6 +232,7 @@ const EditUser = () => {
                             onChange={handleInputChange}
                             value={formData.role}
                         />
+                        
                     </div>
 
                     {/* Confirm Password

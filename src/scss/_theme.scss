@@ -1,5 +1,5 @@
 body {
-  background-color: #9FBDBF;
+  background-color: var(--cui-tertiary-bg);
 }
 
 .wrapper {
@@ -42,31 +42,23 @@ body {
     @include ltr-rtl("margin-right", auto);
   }
 }
-// .header {
-//   background-color: #9FBDBF;
-// }
-
 
 .header > .container-fluid + .container-fluid {
   min-height: 3rem;
 }
 
 .footer {
-  background-color: #9FBDBF;
   min-height: calc(3rem + 1px); // stylelint-disable-line function-disallowed-list
 }
 
 @if $enable-dark-mode {
   @include color-mode(dark) {
     body {
-      background-color: #2c3e50;
-    }
-    .header{
-      background-color: #212631;
+      background-color: var(--cui-dark-bg-subtle);
     }
 
     .footer {
-      background-color: #212631;
+      --cui-footer-bg: var(--cui-body-bg);
     }
   }
 }

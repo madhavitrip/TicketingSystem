@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
@@ -24,16 +24,47 @@ import {
   cilMoon,
   cilSun,
 } from '@coreui/icons'
-
+import { useNotification } from './NotificationContext';
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
+import Badge from 'react-bootstrap/Badge';
+import TicketNotification from '../../src/views/tNotification/TicketNotification';
+import { useUser } from './../context/UserContext'
+
+// import NotificationComponent from './../views/Nots/NotificationComponent'
+
+// import NotificationService from './../views/Nots/NotificationService'
+
+const ticketapi = process.env.REACT_APP_API_TICKET;
 
 const AppHeader = () => {
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
-
+  const { notifications, removeNotification } = useNotification();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const {user}= useUser();
+  const [newTickets, setNewTickets] = useState([]);
+
+  useEffect(() => {
+    const fetchNewTickets = async () => {
+      try {
+        const response = await fetch(`${ticketapi}/new-tickets?email=${user?.email}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch new tickets');
+        }
+        const data = await response.json();
+        setNewTickets(data);
+        console.log(`new${data}`)
+      } catch (error) {
+        console.error('Error fetching new tickets:', error);
+      }
+    };
+
+    fetchNewTickets(); // Fetch new tickets when the component mounts
+  }, []); 
 
   useEffect(() => {
     document.addEventListener('scroll', () => {
@@ -41,6 +72,15 @@ const AppHeader = () => {
         headerRef.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0)
     })
   }, [])
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  // const handleNotificationClick = (notification) => {
+  //   // Handle notification click (if needed)
+  //   // For example, mark it as read or redirect to a specific page
+  //   removeNotification(notification.id);
+  // };
 
   const toggleFullScreen = () => {
     const docElm = document.documentElement
@@ -97,27 +137,20 @@ const AppHeader = () => {
         </CHeaderNav>
         <CHeaderNav className="ms-auto">
           <CNavItem>
-            <CNavLink href="#">
+            <CNavLink href = "/#/SettingsNav/Settings">
               <CIcon icon={cilSettings} size="lg" />
             </CNavLink>
           </CNavItem>
-          {/* <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
-          </CNavItem> */}
-          <CDropdown variant="nav-item" placement="bottom-end">
+            
+          
+          <CDropdown show={dropdownOpen ? 'true' : 'false'} onToggle={toggleDropdown} variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false}>
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-              <span className="badge bg-danger ms-1">3</span> {/* Example badge */}
+              <CIcon icon={cilEnvelopeOpen} size="lg" /> <sup><Badge bg="danger">{newTickets.length}</Badge></sup>
             </CDropdownToggle>
             <CDropdownMenu>
-              {/* Place your notification items here */}
-              <CDropdownItem href="#">Notification 1</CDropdownItem>
-              <CDropdownItem href="#">Notification 2</CDropdownItem>
-              <CDropdownItem href="#">Notification 3</CDropdownItem>
-              {/* Add more notifications as needed */}
+              <TicketNotification newTickets={newTickets}/>
             </CDropdownMenu>
+
           </CDropdown>
         </CHeaderNav>
         <CHeaderNav>

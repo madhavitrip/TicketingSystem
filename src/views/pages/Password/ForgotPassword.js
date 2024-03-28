@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { Card, CardBody, Col, Container, Row, Form, InputGroup, Button } from 'react-bootstrap';
+import { Col, Container, Row, Form, InputGroup, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import './../login/Login.css';
 import { Link } from 'react-router-dom';
+import PageLayout from '../login/PageLayout';
+
+const forgetpasswordapi = process.env.REACT_APP_API_FORGOT_PASSWORD;
 
 const ForgotPassword = () => {
+  const theme = '#FFC727';
   const [email, setEmail] = useState('');
-   const password = 'password';
+  const password = 'password';
   const [emailError, setEmailError] = useState('');
-
+  const [successMessage, setSuccessMesage] = useState('');
+  const [loading, setLoading] = useState(false);
   const handleEmailChange = (value) => {
     setEmail(value);
     setEmailError(!value ? 'Email is required' : '');
@@ -21,10 +26,12 @@ const ForgotPassword = () => {
     }
 
     try {
+      setLoading(true);
       // Make an API call to request password reset
-      const response = await axios.put('https://localhost:7217/api/Login/ForgetPassword', { email, password });
+      const response = await axios.put(forgetpasswordapi, { email, password });
 
       if (response && response.data) {
+        setSuccessMesage('Password has been sent to your email successfully')
         console.log('Password reset email sent successfully');
         // You can redirect the user to a confirmation page if needed
       } else {
@@ -34,54 +41,52 @@ const ForgotPassword = () => {
       console.error('Error while resetting password:', error);
       // Handle error state or display error message to the user
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="bg-body-tertiary min-vh-100 d-flex align-items-center bgimg">
+    <PageLayout bgimg='bgimgforgotpass' theme={theme} >
+
+
       <Container>
-        <Row className="justify-content-center">
-          <Col md={6}>
-            <Card className="p-4 bg-transparent border-0">
-              <CardBody>
-                <Form>
-                  <h1 className='text-white'>Forgot Password</h1>
-                  <p className="text-secondary">Enter your email address to reset your password</p>
-                  <div className="mb-3">
-                    {/* Email Input */}
-                    <InputGroup hasValidation>
-                      <Form.Control
-                        placeholder="Email Address"
-                        autoComplete="email"
-                        value={email}
-                        onChange={(e) => handleEmailChange(e.target.value)}
-                        type="email"
-                        isInvalid={!!emailError}
-                        required
-                      />
-                      <Form.Control.Feedback type="invalid">{emailError}</Form.Control.Feedback>
-                    </InputGroup>
-                  </div>
-                  <Row >
-                    <Col xs={6} className='align-items-start'>
-                      {/* Reset Password Button */}
-                      <Button color="primary" className="px-4" onClick={handleResetPassword}>
-                        Reset Password
-                      </Button>
-                    </Col>
-                    <Col xs={6} className='text-end fs-5'>
-                      {/* Reset Password Button */}
-                      <Link to="/Login" color="primary" className="px-4" onClick={handleResetPassword}>
-                        Login
-                      </Link>
-                    </Col>
-                  </Row>
-                </Form>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+        <Form>
+          <h1 className='text-center'>Forgot Password</h1>
+          <p className="text-center">Enter your email address to reset your password</p>
+          {successMessage && <Alert variant="success">{successMessage}</Alert>}
+          <div className="mb-3">
+            {/* Email Input */}
+            <InputGroup hasValidation>
+              <Form.Control
+                placeholder="Email Address"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => handleEmailChange(e.target.value)}
+                type="email"
+                isInvalid={!!emailError}
+                required
+              />
+              <Form.Control.Feedback type="invalid">{emailError}</Form.Control.Feedback>
+            </InputGroup>
+          </div>
+          <Row >
+            <Col xs={6} className='align-items-start'>
+              {/* Reset Password Button */}
+              <Button color="primary" className="px-4" style={{ backgroundColor: theme }} onClick={handleResetPassword} disabled={loading}>
+                {loading ? 'Loading...' : 'Reset Password'}
+              </Button>
+            </Col>
+            <Col xs={6} className='text-end fs-5'>
+              {/* Reset Password Button */}
+              <Link to="/Login" style={{ color: theme }} className="px-4" onClick={handleResetPassword}>
+                Login
+              </Link>
+            </Col>
+          </Row>
+        </Form>
       </Container>
-    </div>
+    </PageLayout>
   );
 };
 

@@ -16,8 +16,8 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   
   UserProvider.propTypes = {
-    children: PropTypes.node.isRequired, // Add this line for 'children' prop validation
-    value: PropTypes.any.isRequired,    // Add any other prop validations you may need
+    // children: PropTypes.node.isRequired, // Add this line for 'children' prop validation
+    // value: PropTypes.any.isRequired,    // Add any other prop validations you may need
   };
   // Initialize user state using the helper function
   const [user, setUser] = useState(getUserFromLocalStorage());
@@ -36,12 +36,21 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem('user');
   };
 
+  const isLoggedIn = () => {
+    return !! user;
+  };
+
   // Provide the user context to the entire application
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, login, logout, isLoggedIn }}>
       {children}
     </UserContext.Provider>
   );
+};
+
+// Define prop types for UserProvider
+UserProvider.propTypes = {
+  children: PropTypes.node.isRequired, // Ensure children prop is required and a valid React node
 };
 
 // A custom hook to easily access user context within components

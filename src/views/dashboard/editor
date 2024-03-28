@@ -1,0 +1,36 @@
+import React, { useState } from 'react';
+
+const DueToday = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Dummy data for tickets due today
+  const ticketsDueToday = [
+    { id: 1, title: 'Task 1', deadline: '2024-03-27' },
+    { id: 2, title: 'Task 2', deadline: '2024-03-27' },
+    { id: 3, title: 'Task 3', deadline: '2024-03-27' }
+  ];
+
+  const handleToggle = () => {
+    setIsExpanded(prevExpanded => !prevExpanded);
+  };
+
+  return (
+    <div>
+      <button onClick={handleToggle}>
+        {isExpanded ? 'Collapse' : 'Expand'} Due Today
+      </button>
+      {isExpanded && (
+        <div>
+          <h2>List of Tasks Due Today</h2>
+          <ul>
+            {ticketsDueToday.map(ticket => (
+              <li key={ticket.id}>{ticket.title}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DueToday;

@@ -3,13 +3,25 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from './../../context/UserContext';
 import { Spinner } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom";
+import Select from 'react-select';
+import addNotification from "react-push-notification";
+import greentick from './images/greentick.jpg';
+// import NotificationService from '../Nots/NotificationService';
+import * as signalR from '@microsoft/signalr'; // Import SignalR
+
+const dashboardapi= process.env.REACT_APP_MY_SERVER;
+const userapi = process.env.REACT_APP_API_USERS;
+const TicketTypeapi = process.env.REACT_APP_API_TICKETTYPE;
+const ProjectTypeapi = process.env.REACT_APP_API_PROJECTTYPE;
+const Ticketapi = process.env.REACT_APP_API_TICKET;
 
 const AddTicket = () => {
   const navigate = useNavigate();
   const { user } = useUser();
+  
   const [loading, setLoading] = useState(false);
   const [ticketType, setTicketType] = useState([]);
-  const [projectType,setProjectType] = useState([]);
+  const [projectType, setProjectType] = useState([]);
   const [Assignee, setAssignee] = useState([]);
   const [formData, setFormData] = useState({
     email: user.email,
@@ -17,7 +29,7 @@ const AddTicket = () => {
     title: '',
     department: '',
     ticketType: '',
-    status: 'Active',
+    status: 'Open',
     projectType: '',
     dueDate: '',
     description: '',
@@ -25,11 +37,45 @@ const AddTicket = () => {
     attachments: null
   });
   const [message, setMessage] = useState(null);
+  // const [hubConnection, setHubConnection] = useState(null); // State for SignalR connection
+
+  const ClickToNotify = () => {
+   
+
+    addNotification({
+      title: 'Ticket',
+      message: 'New ticket has been assigned',
+      duration: 11000,
+      icon: greentick,
+      native:true,
+      onClick: () => window.location= `${dashboardapi}`,
+
+    });
+  }
+
+  // useEffect(() => {
+  //   // Initialize SignalR connection
+  //   const connection = new signalR.HubConnectionBuilder()
+  //     .withUrl('https://localhost:7217/notificationHub/')
+  //     .build();
+
+  //   setHubConnection(connection);
+
+  //   connection
+  //     .start()
+  //     .then(() => console.log('SignalR Connected'))
+  //     .catch((error) => console.error('SignalR Connection Error: ', error));
+
+  //   return () => {
+  //     connection.stop();
+  //   };
+  // }, []);
+
 
   useEffect(() => {
     async function fetchAssignee() {
       try {
-        const response = await axios.get('https://localhost:7217/api/Users');
+        const response = await axios.get(userapi);
         setAssignee(response.data);
       } catch (error) {
         console.error('Error fetching Assignee:', error);
@@ -42,7 +88,7 @@ const AddTicket = () => {
   useEffect(() => {
     async function fetchTickettype() {
       try {
-        const response = await axios.get('https://localhost:7217/api/TicketTypes');
+        const response = await axios.get(TicketTypeapi);
         setTicketType(response.data);
       } catch (error) {
         console.error('Error fetching Ticket Type:', error);
@@ -55,7 +101,7 @@ const AddTicket = () => {
   useEffect(() => {
     async function fetchProjecttype() {
       try {
-        const response = await axios.get('https://localhost:7217/api/ProjectType');
+        const response = await axios.get(ProjectTypeapi);
         setProjectType(response.data);
       } catch (error) {
         console.error('Error fetching Project Type:', error);
@@ -65,25 +111,52 @@ const AddTicket = () => {
     fetchProjecttype();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
+ // Modify handleInputChange function
+const handleInputChange = (e) => {
+  const { name, value } = e.target || e;
 
-    if (name === 'assigneeEmail') {
-      const selectedAssignee = Assignee.find(assignee => assignee.email === value);
-      if (selectedAssignee) {
-        setFormData(prevData => ({
-          ...prevData,
-          department: selectedAssignee.departmentName,
-        }));
-      } else {
-        console.log('Assignee not found.');
-      }
-    }
-  };
+
+  if (name === 'assigneeEmail') {
+    const selectedAssignee = Assignee.find(assignee => assignee.email === value);
+   
+
+    const isSelfAssign = value.toLowerCase() === user.email.toLowerCase();
+   
+
+    const newDepartment = isSelfAssign ? selectedAssignee.departmentName : (selectedAssignee?.departmentName || '');
+   
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+      department: newDepartment,
+      status: isSelfAssign ? 'Self-Assigned' : 'Open',
+    }));
+  } else {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  }
+};
+
+// ...
+
+// Modify useEffect function for handling assignee changes
+useEffect(() => {
+  const selectedAssignee = Assignee.find((assignee) => assignee.email === formData.assigneeEmail);
+  const isSelfAssign = formData.assigneeEmail.toLowerCase() === user.email.toLowerCase();
+  const newDepartment = isSelfAssign ? selectedAssignee.departmentName : (selectedAssignee?.departmentName || '');
+
+  setFormData((prevData) => ({
+    ...prevData,
+    department: newDepartment,
+    status: isSelfAssign ? 'Self-Assigned' : 'Open',
+  }));
+}, [formData.assigneeEmail, Assignee, user]);
+
+// ...
+
 
   const handleFileChange = (e) => {
     setFormData(prevData => ({
@@ -114,7 +187,7 @@ const AddTicket = () => {
     });
 
     try {
-      const res = await axios.post(`https://localhost:7217/api/Tickets?${formattedParams}`, formDataToSend, {
+      const res = await axios.post(`${Ticketapi}?${formattedParams}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -123,13 +196,21 @@ const AddTicket = () => {
       console.log(res);
       setMessage('Ticket added successfully!');
       setLoading(false);
+
+       // Send notification using SignalR after successful ticket addition
+      //  if (hubConnection) {
+      //   hubConnection.invoke('SendTicketAssignmentNotification', formData.assigneeEmail, `New ticket added: ${formData.title}`);
+      // }
+       ClickToNotify();
+
+
       setFormData({
         email: user.email,
         priority: 'low',
         title: '',
         department: '',
         ticketType: '',
-        status: 'Active',
+        status: 'Open',
         projectType: '',
         dueDate: '',
         description: '',
@@ -144,7 +225,6 @@ const AddTicket = () => {
     }
   };
 
-
   return (
     <div className="container mt-5">
       <div className='d-flex justify-content-between'></div>
@@ -158,27 +238,74 @@ const AddTicket = () => {
       <form onSubmit={handleTicketSubmit}>
         {/* ticketId */}
         <div className="row mb-3">
-          <label htmlFor="ticketId" className="col-sm-3 col-form-label text-end">
-            Ticket ID:
+
+        <label htmlFor="email" className="col-sm-3 col-form-label text-end">
+            Creator
           </label>
           <div className="col-sm-3">
             <input
               type="text"
               className="form-control"
-              id="ticketId"
-
-              name="ticketId"
-              placeholder="Ticket ID"
+              id="email"
+              name="email"
+              placeholder="Enter your Email"
               required
+              value={user.email}
               onChange={handleInputChange}
               disabled
-              value='0'
             />
+         
           </div>
 
           {/* priority */}
+          <label htmlFor="assigneeEmail" className="col-sm-3 col-form-label text-end">
+            Assignee Email<span className="text-danger"> * </span>
+          </label>
+          <div className="col-sm-3">
+            <Select
+              options={Assignee.map((Setas) => ({
+                label: Setas.email,
+                value: Setas.email,
+              }))}
+              value={{
+                label: formData.assigneeEmail,
+                value: formData.assigneeEmail,
+              }}
+              onChange={(selectedOption) =>
+                handleInputChange({
+                  target: { name: 'assigneeEmail', value: selectedOption.value },
+                })
+              }
+              isSearchable
+              placeholder="Select Assignee"
+            />
+          </div>
+
+
+
+
+          
+        </div>
+
+        {/* title */}
+        <div className="row mb-3">
+          <label htmlFor="title" className="col-sm-3 col-form-label text-end">
+            Title<span className="text-danger"> * </span>
+          </label>
+          <div className="col-sm-3">
+            <input
+              type="text"
+              className="form-control"
+              id="title"
+              name="title"
+              placeholder="Enter title"
+              required
+              onChange={handleInputChange}
+            />
+          </div>
+          {/* department */}
           <label htmlFor="priority" className="col-sm-3 col-form-label text-end">
-            Priority<span className="text-danger">  * </span>
+            Priority<span className="text-danger"> * </span>
           </label>
           <div className="col-sm-3">
             <select
@@ -197,142 +324,76 @@ const AddTicket = () => {
           </div>
         </div>
 
-        {/* title */}
-        <div className="row mb-3">
-          <label htmlFor="title" className="col-sm-3 col-form-label text-end">
-            Title<span className="text-danger">  * </span>
-          </label>
-          <div className="col-sm-3">
-            <input
-              type="text"
-              className="form-control"
-              id="title"
-              name="title"
-              placeholder="Enter title"
-              required
-              onChange={handleInputChange}
-            />
-          </div>
-          {/* department */}
-          <label htmlFor="department" className="col-sm-3 col-form-label text-end">
-            Department<span className="text-danger">  * </span>
-          </label>
-          <div className="col-sm-3">
-            <input
-              className="form-control"
-              id="department"
-              name="department"
-              value={formData.department}
-              required
-              onChange={handleInputChange}
-              disabled
-            >
-            </input>
-          </div>
-        </div>
-
         {/* Ticket Type */}
         <div className="row mb-3">
           <label htmlFor="ticketType" className="col-sm-3 col-form-label text-end">
-            Ticket Type<span className="text-danger">  * </span>
+            Ticket Type<span className="text-danger"> * </span>
           </label>
           <div className="col-sm-3">
-            <select
-              className="form-select"
-              id="ticketType"
-              name="ticketType"
-
-              required
-              onChange={handleInputChange}
-            >
-              <option value="">Select Ticket Type</option>
-              {ticketType.map(TT => (
-                <option key={TT.id} value={TT.ticketType}>{TT.ticketType}</option>
-              ))}
-            </select>
+            <Select
+              options={ticketType.map((TT) => ({
+                label: TT.ticketType,
+                value: TT.ticketType,
+              }))}
+              value={{
+                label: formData.ticketType,
+                value: formData.ticketType,
+              }}
+              onChange={(selectedOption) =>
+                handleInputChange({
+                  target: { name: 'ticketType', value: selectedOption.value },
+                })
+              }
+              isSearchable
+              placeholder="Select Ticket Type"
+            />
           </div>
           {/* status */}
           <label htmlFor="status" className="col-sm-3 col-form-label text-end">
-            Status<span className="text-danger">  * </span>
+            Status
           </label>
           <div className="col-sm-3">
             <input
-              className="form-select"
+              className="form-control"
               id="status"
               name="status"
-              value= "Active"
+              value={formData.status}
               required
               onChange={handleInputChange}
-              disabled
-            />
-
-          </div>
-        </div>
-
-        {/* Creator ID */}
-        <div className="row mb-3">
-          <label htmlFor="email" className="col-sm-3 col-form-label text-end">
-            Creator<span className="text-danger">  * </span>
-          </label>
-          <div className="col-sm-3">
-            <input
-              type="text"
-              className="form-control"
-              id="email"
-              name="email"
-              placeholder="Enter your Email"
-              required
-              value={user.email}
-              onChange={handleInputChange}
+              readOnly
               disabled
             />
           </div>
-
-          {/* Assigned To */}
-          <label htmlFor="assigneeEmail" className="col-sm-3 col-form-label text-end">
-            Assignee Email<span className="text-danger">  * </span>
-          </label>
-          <div className="col-sm-3">
-            <select
-              className="form-select"
-              id="assigneeEmail"
-              name="assigneeEmail"
-
-              required
-              onChange={handleInputChange}
-            >
-              <option selected key="self" value={user.email}>Self Assigned</option>
-              {Assignee.map(Setas => (
-                <option key={Setas.id} value={Setas.email}>{Setas.email}</option>
-              ))}
-            </select>
-
-          </div>
         </div>
-        {/* Project Type */}
-        <div className="row mb-3">
+
+
+         {/* Project Type */}
+         <div className="row mb-3">
           <label htmlFor="projectType" className="col-sm-3 col-form-label text-end">
-            Project Type<span className="text-danger">  * </span>
+            Project Type<span className="text-danger"> * </span>
           </label>
           <div className="col-sm-3">
-          <select
-              className="form-control"
-              id="projectType"
-              name="projectType"
-
-              required
-              onChange={handleInputChange}
-            >
-              <option value="">Select Project Type</option>
-              {projectType.map(pt => (
-                <option key={pt.id} value={pt.projectTypes}>{pt.projectTypes}</option>
-              ))}
-            </select>
+            <Select
+              options={projectType.map((pt) => ({
+                label: pt.projectTypes,
+                value: pt.projectTypes,
+              }))}
+              value={{
+                label: formData.projectType,
+                value: formData.projectType,
+              }}
+              onChange={(selectedOption) =>
+                handleInputChange({
+                  target: { name: 'projectType', value: selectedOption.value },
+                })
+              }
+              isSearchable
+              placeholder="Select Project Type"
+            />
           </div>
-
           {/* Due Date */}
           <label htmlFor="dueDate" className="col-sm-3 col-form-label text-end">
-            Due Date<span className="text-danger">  * </span>
+            Due Date<span className="text-danger"> * </span>
           </label>
           <div className="col-sm-3">
             <input
@@ -345,13 +406,55 @@ const AddTicket = () => {
               onChange={handleInputChange}
             />
           </div>
-
         </div>
+
+        {/* Creator ID */}
+        <div className="row mb-3">
+        <label htmlFor="ticketId" className="col-sm-3 col-form-label text-end">
+            Ticket ID:
+          </label>
+          <div className="col-sm-3">
+            <input
+              type="text"
+              className="form-control"
+              id="ticketId"
+              name="ticketId"
+              placeholder="Ticket ID"
+              required
+              onChange={handleInputChange}
+              disabled
+              value='0'
+            />
+          </div>
+
+          {/* Assigned To */}
+          <label htmlFor="department" className="col-sm-3 col-form-label text-end">
+            Department
+          </label>
+          <div className="col-sm-3">
+            <input
+              className="form-control"
+              id="department"
+              name="department"
+              value={formData.department || ''}
+              required
+              onChange={handleInputChange}
+              readOnly
+              disabled
+            />
+          </div>
+
+
+
+
+         
+        </div>
+       
 
         {/* description */}
         <div className="row mb-3">
           <label htmlFor="description" className="col-sm-3 col-form-label text-end">
-            Description<span className="text-danger">  * </span>
+            Description<span className="text-danger"> * </span>
           </label>
           <div className="col-sm-9">
             <textarea
@@ -385,16 +488,15 @@ const AddTicket = () => {
         <div className="row mb-3">
           <div className="col-sm-3"></div>
           <div className="col-sm-9 text-end">
-            <button type="submit" className="btn btn-primary" disabled={loading}>
+            <button type="submit" className="btn btn-primary" disabled={loading} >
               {loading ? <><Spinner animation="border" size='sm' /> Adding Ticket...</> : "Add Ticket"}
             </button>
           </div>
         </div>
       </form>
+      
     </div>
-
   );
 };
-
 
 export default AddTicket;

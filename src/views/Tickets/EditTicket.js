@@ -4,11 +4,19 @@ import { useParams } from 'react-router-dom';
 import { Row, Col, Button, Form, Modal } from 'react-bootstrap';
 import './EditTicket.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCommentDots, faPaperclip } from '@fortawesome/free-solid-svg-icons';
+import { faCommentDots, faPaperclip, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useUser } from './../../context/UserContext';
 import ReactQuill from 'react-quill';  // Import ReactQuill
 import 'react-quill/dist/quill.snow.css';  // Import Quill styles
+import { useSecurity } from './../../context/Security';
 
+const baseapi = process.env.REACT_APP_BASE_URL;
+const userapi = process.env.REACT_APP_API_USERS;
+const ticketapi = process.env.REACT_APP_API_TICKET;
+const TicketTypeapi = process.env.REACT_APP_API_TICKETTYPE;
+const Commentapi = process.env.REACT_APP_API_TICKETFLOW_BY_COMMENTS;
+const TicketFlowapi = process.env.REACT_APP_API_TICKETFLOW;
+const markcompleted = process.env.REACT_APP_API_TICKET_COMPLETED;
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -33,6 +41,8 @@ const toolbarOptions = [
 const EditTicket = () => {
   const { user } = useUser();
   const { ticketId } = useParams();
+  const {decrypt} = useSecurity(); 
+  const decryptid = decrypt(ticketId);
   const [formData, setFormData] = useState({
     ticketId: '',
     email: '',
@@ -63,16 +73,19 @@ const EditTicket = () => {
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [isImageAttachment, setIsImageAttachment] = useState(false);
   const [attachedFile, setAttachedFile] = useState(null);
+  const [hovered, setHovered] = useState(false);
+
+
 
 
   useEffect(() => {
     async function fetchTicketDetails() {
       try {
         const [ticketResponse, commentsResponse, assigneesResponse, ticketTypesResponse] = await Promise.all([
-          axios.get(`https://localhost:7217/api/Tickets/${ticketId}`),
-          axios.get(`https://localhost:7217/api/TicketFlow/CommentsByTicketId/${ticketId}`).catch(() => ({ data: [] })),
-          axios.get('https://localhost:7217/api/Users'),
-          axios.get('https://localhost:7217/api/TicketTypes'),
+          axios.get(`${ticketapi}/${decryptid}`),
+          axios.get(`${Commentapi}/${decryptid}`).catch(() => ({ data: [] })),
+          axios.get(userapi),
+          axios.get(TicketTypeapi),
         ]);
         setFormData(ticketResponse.data);
         setOldDetails(ticketResponse.data);
@@ -89,24 +102,8 @@ const EditTicket = () => {
 
     fetchTicketDetails();
     setCurrentDateTime(new Date().toLocaleString());
-  }, [ticketId]);
+  }, [decryptid]);
 
-
-  useEffect(() => {
-    // Check if the due date has passed
-    const isDueDatePassed = new Date(formData.dueDate) < new Date();
-
-    // Check if the status is not already "Completed"
-    const isNotCompleted = formData.status !== 'Completed';
-
-    // Update status to "Pending" if due date is exceeded and status is not "Completed"
-    if (isDueDatePassed && isNotCompleted) {
-      setFormData((prevData) => ({
-        ...prevData,
-        status: 'Pending',
-      }));
-    }
-  }, [formData.dueDate, formData.status]);
   // Function to sort comments by timestamp in descending order (newest first) 
   const sortCommentsByTimestampDesc = () => {
     const sortedComments = [...comments].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -177,18 +174,19 @@ const EditTicket = () => {
       const params = {
         firstName: user.firstName,
         prev: formData.priority,
-        pre: formData.assigneeEmail,
+        pre: formData.status,
         newp: formData.userPriority,
-        pret: formData.priority,
+        pret: formData.ticketType,
         newt: formData.userTicketType,
+        newa: formData.userAssigneeEmail,
         news: formData.userStatus,
-        prep: formData.userPriority,
+        prep: formData.priority,
         ticketid: formData.ticketId,
         timestamp: new Date().toISOString(),
         comment: newComment,
       };
 
-      const url = `https://localhost:7217/api/TicketFlow?${new URLSearchParams(params).toString()}`;
+      const url = `${TicketFlowapi}?${new URLSearchParams(params).toString()}`;
 
       let bodyFormData = new FormData();
 
@@ -237,7 +235,7 @@ const EditTicket = () => {
       // Show the modal
       setShowAttachmentModal(true);
     } else {
-      window.open(`https://localhost:7217/${formData.attachment.replace('wwwroot/', '')}`, '_blank');
+      window.open(`${baseapi}/${formData.attachment.replace('wwwroot/', '')}`, '_blank');
     }
   };
 
@@ -245,8 +243,53 @@ const EditTicket = () => {
     setShowAttachmentModal(false);
   };
 
+  const handleMouseEnter = () => {
+    setHovered(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setHovered(false);
+  };
+
+ const markAsCompleted = async () => {
+  try {
+    // Send a request to update the ticket status to "Completed"
+    const response = await axios.put(`${markcompleted}/${decryptid}`, {
+      status: 'Completed',
+    });
+
+    console.log('Response:', response);
+
+    // Check if the update was successful
+    if (response.status === 200 || response.status===204) {
+      // Update local state to reflect the new status
+      setFormData((prevData) => ({
+        ...prevData,
+        status: 'Completed',
+      }));
+      setMessage('Ticket marked as completed successfully!');
+    } else {
+      setMessage('Error marking ticket as completed. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error marking ticket as completed:', error);
+    setMessage('Error marking ticket as completed.');
+  }
+};
+
   return (
     <div className="container mt-3">
+      <div className='d-flex justify-content-between '>
+          <h4>Ticket Section</h4>
+          {user.email === formData.email && (
+          <Button onClick={markAsCompleted} disabled={formData.status === 'Completed'} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+            {hovered ? <FontAwesomeIcon icon={faCheck} /> : ' '}
+            {formData.status === 'Completed' ? 'Completed' : 'Mark as Completed'}
+           
+          </Button>
+          )}
+      </div>
+      
       <Row>
         <Col>
           <label htmlFor="email" className="col-form-label text-end">
@@ -331,15 +374,7 @@ const EditTicket = () => {
             />
           </div>
         </Col>
-        {/* Show Attachment Button */}
-        {formData.attachment && (
-          <Col>
-            <Button className="mt-3" onClick={handleShowAttachmentModal}>
-              <FontAwesomeIcon icon={faPaperclip} className="me-2" />
-              Show Attachment
-            </Button>
-          </Col>
-        )}
+        
 
         {/* Attachment Modal */}
         <Modal show={showAttachmentModal} onHide={handleCloseAttachmentModal}>
@@ -349,7 +384,7 @@ const EditTicket = () => {
           <Modal.Body>
             {/* Check if formData.attachment is defined before processing */}
 
-            {isImageAttachment && (<img src={`https://localhost:7217/${formData.attachment.replace('wwwroot/', '')}`} alt="Attachment" className="img-fluid" />)}
+            {isImageAttachment && (<img src={`${baseapi}/${formData.attachment.replace('wwwroot/', '')}`} alt="Attachment" className="img-fluid" />)}
 
 
           </Modal.Body>
@@ -373,7 +408,7 @@ const EditTicket = () => {
         </div>
         <div>
           <Button onClick={toggleCollapse}>
-            {collapsed ? <i className="fa-solid fa-chevron-down"></i> : <i className="fa-solid fa-angle-up"></i>}
+            {collapsed ? <i className="fa-solid fa-angles-right"></i> : <i className="fa-solid fa-angles-left"></i>}
           </Button>
         </div>
 
@@ -407,6 +442,16 @@ const EditTicket = () => {
                   rows="6"
                   disabled
                 />
+
+                {/* Show Attachment Button */}
+        {formData.attachment && (
+          <Col>
+            <Button className="mt-3" onClick={handleShowAttachmentModal}>
+              <FontAwesomeIcon icon={faPaperclip} className="me-2" />
+              Show Attachment
+            </Button>
+          </Col>
+        )}
               </div>
             </Col>
             <Col md={5}>
@@ -448,7 +493,7 @@ const EditTicket = () => {
                   </Form.Label>
                   <Col sm={8}>
                     <Form.Select value={formData.status} onChange={handleInputChange} name="status" disabled>
-                      <option value="Active">Active</option>
+                      <option value="Open">Open</option>
                       <option value="Pending">Pending</option>
                       <option value="Unassigned">Unassigned</option>
                       <option value="Completed">Completed</option>
@@ -539,7 +584,7 @@ const EditTicket = () => {
                       <Col sm={8}>
                         <Form.Select value={formData.userStatus} onChange={handleInputChange} name="userStatus">
                           <option value="">Select Status</option>
-                          <option value="Active">Active</option>
+                          <option value="Open">Open</option>
                           <option value="Pending">Pending</option>
                           <option value="Unassigned">Unassigned</option>
                           <option value="Completed">Completed</option>
@@ -583,7 +628,7 @@ const EditTicket = () => {
                     {comment.attachment && (
                       <div>
                         <strong></strong>
-                        <a href={`https://localhost:7217/${comment.attachment.replace('wwwroot/', '')}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`${baseapi}/${comment.attachment.replace('wwwroot/', '')}`} target="_blank" rel="noopener noreferrer">
                           {'View Attachment'}
                         </a>
                       </div>

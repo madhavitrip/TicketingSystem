@@ -1,10 +1,12 @@
 import React, { Suspense, useEffect } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
 import { UserProvider } from './context/UserContext';
 import PrivateRoute from './components/PrivateRoute'
+import { NotificationProvider } from './components/NotificationContext';
+import useSignalR from './components/useSignalR';
 
 
 // Containers
@@ -22,7 +24,7 @@ const AccessDeniedPage = React.lazy(()=> import('./views/pages/page403/AccessDen
 const App = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
   const storedTheme = useSelector((state) => state.theme)
-
+  const signalRConnection = useSignalR();
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.href.split('?')[1])
     const theme = urlParams.get('theme') && urlParams.get('theme').match(/^[A-Za-z0-9\s]+/)[0]
@@ -39,9 +41,9 @@ const App = () => {
 
   return (
 
-    <UserProvider>
-    
-    <BrowserRouter>
+    <UserProvider >
+    <NotificationProvider signalRConnection={signalRConnection}>
+    <HashRouter>
       <Suspense
         fallback={
           <div className="pt-3 text-center">
@@ -60,7 +62,8 @@ const App = () => {
           <Route path="*" name="Home" element={<PrivateRoute element={<DefaultLayout/>}/>} />
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
+    </NotificationProvider>
     </UserProvider>
   )
 }

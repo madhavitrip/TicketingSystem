@@ -5,6 +5,8 @@ import PropTypes from 'prop-types'; // Import PropTypes
 import { useUser } from './UserContext';
 import axios from 'axios';
 
+const permissionapi = process.env.REACT_APP_API_PERMISSION;
+
 const PermissionDecorator = ({ element, moduleId, permissionType }) => {
   const {user} = useUser();
   const [permissions, setPermissions] = useState([]);
@@ -16,7 +18,7 @@ const PermissionDecorator = ({ element, moduleId, permissionType }) => {
         const userId = user.userId; // Assuming you are using a fixed userId for now
         console.log("userId")
         console.log(userId)
-        const response = await axios.get(`https://localhost:7217/api/Permission/ByUser/${userId}`);
+        const response = await axios.get(`${permissionapi}/ByUser/${userId}`);
         setPermissions(response.data);
         setLoading(false);
         console.log(response.data);

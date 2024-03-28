@@ -1,8 +1,16 @@
+// ViewAllTickets.js
+
 import React, { useState, useEffect } from 'react';
 import TicketsTable from './TicketsTable';
-import { Spinner, Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Spinner, Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import PermissionChecker from './../../context/PermissionChecker';
-import AddTicket from './AddTicket'; // Import the AddTicket component
+import { useNavigate } from 'react-router-dom';
+import { useUser } from './../../context/UserContext';
+
+ 
+
+const ticketapi = process.env.REACT_APP_API_TICKET;
+const archivedapi = process.env.REACT_APP_API_ARCHIEVED;
 
 const ViewAllTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -10,11 +18,13 @@ const ViewAllTickets = () => {
   const [loading, setLoading] = useState(true);
   const [priorityFilter, setPriorityFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [modalShow, setModalShow] = useState(false); // New state for modal
+  const [archivedTickets, setArchivedTickets] = useState([]); // State for archived tickets 
+  const {user} = useUser();
 
+  let navigate = useNavigate();
   const onClickAddTicket = () => {
-    // Open modal when clicking Add Ticket
-    setModalShow(true);
+    let path = `/Tickets/AddTicket`;
+    navigate (path);
   };
 
   const fetchData = async (url) => {
@@ -30,11 +40,12 @@ const ViewAllTickets = () => {
       throw error;
     }
   };
+  
 
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const data = await fetchData('https://localhost:7217/api/Tickets');
+        const data = await fetchData(`${ticketapi}?userId=${user.userId}`);
         setTickets(data);
         setLoading(false);
       } catch (error) {
@@ -43,7 +54,7 @@ const ViewAllTickets = () => {
     };
 
     fetchTickets();
-  }, []); // Empty dependency array ensures the effect runs only once on mount
+  }, [user.userId]);
 
   useEffect(() => {
     const applyFilters = async () => {
@@ -67,6 +78,27 @@ const ViewAllTickets = () => {
     applyFilters();
   }, [tickets, priorityFilter, statusFilter]);
 
+  useEffect(() => { 
+    const fetchTickets = async () => { 
+      try { 
+        const activeTickets = await fetchData(`${ticketapi}?userId=${user.userId}`); 
+        const archivedTicketsData = await fetchData(`${archivedapi}?userId=${user.userId}`); 
+         
+        // Filter out archived tickets by ID 
+       
+        setTickets(activeTickets); 
+        setArchivedTickets(archivedTicketsData); 
+        setLoading(false); 
+         
+      } catch (error) { 
+        setLoading(false); 
+      } 
+    }; 
+   
+    fetchTickets(); 
+  }, [user.userId]); // Empty dependency array ensures the effect runs only once on mount 
+
+
   return (
     <PermissionChecker>
       {({ hasPermission }) => (
@@ -77,21 +109,21 @@ const ViewAllTickets = () => {
               <DropdownButton title={`Priority: ${priorityFilter}`} variant="info">
                 <Dropdown.Item onClick={() => setPriorityFilter('All')}>All</Dropdown.Item>
                 <Dropdown.Item onClick={() => setPriorityFilter('High')}>High</Dropdown.Item>
-                <Dropdown.Item onClick={() => setPriorityFilter('Medium')}>Medium</Dropdown.Item>
+                <Dropdown.Item onClick={() => setPriorityFilter('medium')}>Medium</Dropdown.Item>
                 <Dropdown.Item onClick={() => setPriorityFilter('Low')}>Low</Dropdown.Item>
               </DropdownButton>
 
               <DropdownButton title={`Status: ${statusFilter}`} variant="info">
                 <Dropdown.Item onClick={() => setStatusFilter('All')}>All</Dropdown.Item>
-                <Dropdown.Item onClick={() => setStatusFilter('Active')}>Active</Dropdown.Item>
+                <Dropdown.Item onClick={() => setStatusFilter('Open')}>Open</Dropdown.Item>
                 <Dropdown.Item onClick={() => setStatusFilter('Pending')}>Pending</Dropdown.Item>
                 <Dropdown.Item onClick={() => setStatusFilter('Unassigned')}>Unassigned</Dropdown.Item>
                 <Dropdown.Item onClick={() => setStatusFilter('Completed')}>Completed</Dropdown.Item>
               </DropdownButton>
-              {hasPermission(2, 'canAddOnly') &&(
-              <Button type="button" className="btn btn-primary" onClick={onClickAddTicket}>
-                Add Ticket
-              </Button>
+              {hasPermission(2, 'canAddOnly') && (
+                <Button type="button" className="btn btn-primary" onClick={onClickAddTicket}>
+                  Add Ticket
+                </Button>
               )}
             </div>
           </div>
@@ -104,30 +136,11 @@ const ViewAllTickets = () => {
                 </Spinner>
               </div>
             ) : (
-              <TicketsTable tickets={statusFilter !== 'All' || priorityFilter !== 'All' ? filteredTickets : tickets} hasPermission={hasPermission} />
+              <TicketsTable tickets={statusFilter !== 'All' || priorityFilter !== 'All' ? filteredTickets : tickets} hasPermission={hasPermission} setTickets={setTickets} />
             )}
           </div>
 
-          {/* Modal for adding a ticket */}
-          <Modal show={modalShow} onHide={() => setModalShow(false)} dialogClassName="modal-lg">
-            <Modal.Header closeButton>
-              <Modal.Title>Add Ticket</Modal.Title>
-            </Modal.Header>
-            <Modal.Body >
-              {/* Add your form or content for adding a ticket here */}
-              <AddTicket />
-            </Modal.Body>
-            <Modal.Footer>
-              {/* <Button variant="secondary" onClick={() => setModalShow(false)}>
-                Close
-              </Button> */}
-              {/* Add any additional buttons or actions for adding a ticket */}
-              
-              {/* <Button variant="primary" onClick={() => setModalShow(false)}>
-                Save Ticket
-              </Button> */}
-            </Modal.Footer>
-          </Modal>
+          
         </div>
       )}
     </PermissionChecker>
