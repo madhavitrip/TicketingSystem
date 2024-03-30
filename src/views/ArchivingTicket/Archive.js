@@ -22,9 +22,9 @@ const ArchiveTable = () => {
   const {user} = useUser();
 
 
-  const handleCloseAttachmentModal = () => {
-    setShowAttachmentModal(false);
-  };
+  // const handleCloseAttachmentModal = () => {
+  //   setShowAttachmentModal(false);
+  // };
 
   useEffect(() => {
     const fetchArchivedTickets = async () => {
@@ -40,7 +40,7 @@ const ArchiveTable = () => {
     };
 
     fetchArchivedTickets();
-  }, []);
+  }, [user.userId]);
 
   const handleUnarchiveTicket = async () => {
     try {

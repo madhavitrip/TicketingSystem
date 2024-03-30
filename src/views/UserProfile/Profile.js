@@ -68,6 +68,8 @@ const ProfilePage = () => {
   useEffect(() => {
     if (assignedTicketsCount !== null) {
       animateCounter(assignedTicketsCounterRef, assignedTicketsCount);
+
+
     }
   }, [assignedTicketsCount]);
 
@@ -88,7 +90,7 @@ const ProfilePage = () => {
         clearInterval(interval);
       }
 
-      $(counterRef.current).find('.counter-value').text(Math.ceil(startValue));
+      $(counterRef.current).find('.counter-value').text(Math.ceil(startValue.toString()));
     }, 40);
   };
 
@@ -100,7 +102,9 @@ const ProfilePage = () => {
       }
 
       const data = await response.json();
-      const totalAssignedCount = data.activeCount + data.pendingCount + data.selfassignedCount + data.completedCount;
+      const totalAssignedCount = data?.openCount + data.pendingCount + data.selfassignedCount + data.completedCount;
+  
+
       setAssignedTicketsCount(totalAssignedCount);
       console.log('Assigned Tickets Count:', totalAssignedCount);
     } catch (error) {
@@ -221,6 +225,7 @@ const ProfilePage = () => {
                   me="rounded-3">
                   <MDBListGroupItem className="d-flex justify-content-between align-items-center p-3 fs-5" ref={assignedTicketsCounterRef} style={{ backgroundColor: '#FA8247' }}>
                     <MDBCardText className='counter-value fw-bold fs-3'>{assignedTicketsCount}</MDBCardText>
+
                     <MDBCardText>Total Tickets Assigned</MDBCardText>
                   </MDBListGroupItem>
 
