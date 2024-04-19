@@ -30,32 +30,21 @@ export const AppSidebarNav = ({ items }) => {
   
 
   const navItem = (item, index, indent = false) => {
-    const { component: Component, name, badge, icon, ...rest } = item;
-  
+    const { component, name, badge, icon, ...rest } = item
+    const Component = component
     return (
 
-      <PermissionChecker>
-      {({ hasPermission }) => {
-        const isVisible = hasPermission(item.module, item.permission);
+      <Component
+        {...(rest.to &&
+          !rest.items && {
+          component: NavLink,
+        })}
+        key={index}
+        {...rest}
+      >
+        {navLink(name, icon, badge, indent)}
+      </Component>
 
-        if (isVisible) {
-          return (
-            <Component
-              {...(rest.to &&
-                !rest.items && {
-                component: NavLink,
-              })}
-              key={index}
-              {...rest}
-            >
-              {navLink(name, icon, badge, indent)}
-            </Component>
-          );
-        }
-
-        return null; // Return null if user doesn't have permission to see this nav item
-      }}
-    </PermissionChecker>
     )
   }
   const navGroup = (item, index) => {

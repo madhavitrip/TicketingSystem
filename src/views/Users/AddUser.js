@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './AddUser.css';
 import { Spinner, Col } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
-import { UseSecurity, useSecurity } from "./../../context/Security";
+import { useSecurity } from "./../../context/Security";
 
 
 const departmentapi = process.env.REACT_APP_API_DEPARTMENTS;
@@ -26,8 +26,8 @@ const AddUser = () => {
     password: '',
     autoGenPass: true,
     mobileNo: '',
-    departmentName: '',
-    role: '',
+    departmentId: '',
+    roleId: '',
     address: '',
     dateOfBirth: '',
     profilePicturePath: null,
@@ -95,8 +95,8 @@ const AddUser = () => {
           password: '',
           autoGenPass: true,
           mobileNo: '',
-          departmentName: '',
-          role: '',
+          departmentId: '',
+          roleId: '',
           address: '',
           dateOfBirth: '',
           profilePicturePath: null,
@@ -251,41 +251,41 @@ const AddUser = () => {
           {/* Department */}
 
 
-          <label htmlFor="departmentName" className="col-sm-1 col-form-label text-start">
+          <label htmlFor="departmentId" className="col-sm-1 col-form-label text-start">
             Department<span className="text-danger">*</span>
           </label>
           <div
             className="col-sm-3">
             <select
               className="form-select"
-              id="departmentName"
-              name="departmentName"
+              id="departmentId"
+              name="departmentId"
 
               required
               onChange={handleInputChange}
             >
               <option value="">Select department</option>
               {departments.map(dep => (
-                <option key={dep.id} value={dep.departmentName}>{dep.departmentName}</option>
+                <option key={dep.departmentId} value={dep.departmentId}>{dep.departmentName}</option>
               ))}
             </select>
           </div>
           {/* Designation */}
-          <label htmlFor="role" className="col-sm-1 col-form-label text-start">
+          <label htmlFor="roleId" className="col-sm-1 col-form-label text-start">
             Designation<span className="text-danger">*</span>
           </label>
           <div className="col-sm-3">
             <select
               className="form-select"
-              id="role"
-              name="role"
+              id="roleId"
+              name="roleId"
 
               required
               onChange={handleInputChange}
             >
               <option value="">Select Role</option>
               {Roles.map(role => (
-                <option key={role.roleId} value={role.role}>{role.role}</option>
+                <option key={role.roleId} value={role.roleId}>{role.role}</option>
               ))}
             </select>
           </div>

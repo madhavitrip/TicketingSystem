@@ -24,7 +24,7 @@ import {
   cilMoon,
   cilSun,
 } from '@coreui/icons'
-import { useNotification } from './NotificationContext';
+
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import Badge from 'react-bootstrap/Badge';
@@ -40,7 +40,7 @@ const ticketapi = process.env.REACT_APP_API_TICKET;
 const AppHeader = () => {
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
-  const { notifications, removeNotification } = useNotification();
+  
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)

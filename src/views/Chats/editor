@@ -1,0 +1,366 @@
+import React, { useState, useEffect } from 'react';
+import { HubConnectionBuilder } from '@microsoft/signalr';
+
+const ChatComponent = () => {
+  const [messages, setMessages] = useState([]); // State to store messages
+  const [connection, setConnection] = useState(null); // State for SignalR connection
+  const [isConnected, setIsConnected] = useState(false); // State to track connection status
+  const [inputUser, setInputUser] = useState(''); // State for user input
+  const [inputMessage, setInputMessage] = useState(''); // State for message input
+
+  useEffect(() => {
+    // Create a new SignalR connection
+    const newConnection = new HubConnectionBuilder()
+      .withUrl('https://localhost:7217/chathub') // Update URL if needed
+      .withAutomaticReconnect()
+      .build();
+
+    newConnection.start()
+      .then(() => {
+        console.log('SignalR Connected');
+        setIsConnected(true); // Update connection status
+      })
+      .catch(err => console.error('SignalR Connection Error: ', err));
+
+    newConnection.on('ReceiveMessage', (user, message) => {
+      console.log('Message received:', `${user} says ${message}`);
+      // Update messages state with the new message
+      setMessages(prevMessages => [...prevMessages, { user, message }]);
+    });
+
+    setConnection(newConnection);
+
+    // Clean up function to stop the connection when the component unmounts
+    return () => {
+      if (newConnection) {
+        newConnection.stop();
+      }
+    };
+  }, []);
+
+  const handleSendClick = () => {
+    if (inputUser.trim() !== '' && inputMessage.trim() !== '') {
+      if (!connection) {
+        console.log('SignalR connection is null. Reinitializing...');
+        initializeSignalRConnection(); // Reinitialize SignalR connection
+        return; // Exit the function and wait for the connection to be reinitialized
+      }
+  
+      // Connection is not null, proceed with invoking SendMessage
+      connection.invoke('SendMessage', inputUser, inputMessage)
+        .then(() => {
+          console.log('Message sent successfully:', inputUser, inputMessage);
+          // Clear input fields after sending the message
+          setInputUser('');
+          setInputMessage('');
+          // Update messages state with the sent message
+          setMessages(prevMessages => [...prevMessages, { user: inputUser, message: inputMessage }]);
+        })
+        .catch(err => console.error('Error sending message:', err.toString()));
+    } else {
+      console.error('User and message cannot be empty.');
+    }
+  };
+  
+  const initializeSignalRConnection = () => {
+    const newConnection = new HubConnectionBuilder()
+      .withUrl('https://localhost:7217/chathub') // Update URL if needed
+      .withAutomaticReconnect()
+      .build();
+  
+    newConnection.start()
+      .then(() => {
+        console.log('SignalR Connected');
+        setIsConnected(true); // Update connection status
+        setConnection(newConnection); // Set the new connection
+      })
+      .catch(err => console.error('SignalR Connection Error: ', err));
+  };
+
+  return (
+    <div>
+      <div>
+        {/* Display the list of messages */}
+        <ul data-testid="messages-list">
+          {messages.map((msg, index) => (
+            <li key={index}>{`${msg.user} says: ${msg.message}`}</li>
+          ))}
+        </ul>
+      </div>
+      {/* Input fields for user and message */}
+      <input type="text" placeholder="Enter user" value={inputUser} onChange={e => setInputUser(e.target.value)} />
+      <input type="text" placeholder="Enter message" value={inputMessage} onChange={e => setInputMessage(e.target.value)} />
+      {/* Send button */}
+      <button onClick={handleSendClick} disabled={!isConnected}>Send with React</button>
+    </div>
+ 
+  )}
+  export default ChatComponent;
+
+
+// import React, { useState, useEffect } from 'react';
+// import { HubConnectionBuilder } from '@microsoft/signalr';
+
+// const ChatComponent = () => {
+//   const [messages, setMessages] = useState([]); // State to store messages
+//   const [connection, setConnection] = useState(null); // State for SignalR connection
+//   const [isConnected, setIsConnected] = useState(false); // State to track connection status
+//   const [inputUser, setInputUser] = useState(''); // State for user input
+//   const [inputMessage, setInputMessage] = useState(''); // State for message input
+
+//   useEffect(() => {
+//     // Create a new SignalR connection
+//     const newConnection = new HubConnectionBuilder()
+//       .withUrl('https://localhost:7217/chathub') // Update URL if needed
+//       .withAutomaticReconnect()
+//       .build();
+
+//     newConnection.start()
+//       .then(() => {
+//         console.log('SignalR Connected');
+//         setIsConnected(true); // Update connection status
+//       })
+//       .catch(err => console.error('SignalR Connection Error: ', err));
+
+//     newConnection.on('ReceiveMessage', (user, message) => {
+//       console.log('Message received:', `${user} says ${message}`);
+//       // Update messages state with the new message
+//       setMessages(prevMessages => [...prevMessages, { user, message }]);
+//     });
+
+//     setConnection(newConnection);
+
+//     // Clean up function to stop the connection when the component unmounts
+//     return () => {
+//       if (newConnection) {
+//         newConnection.stop();
+//       }
+//     };
+//   }, []);
+
+//   const handleSendClick = () => {
+//     if (inputUser.trim() !== '' && inputMessage.trim() !== '') {
+//       if (!connection) {
+//         console.log('SignalR connection is null. Reinitializing...');
+//         initializeSignalRConnection(); // Reinitialize SignalR connection
+//         return; // Exit the function and wait for the connection to be reinitialized
+//       }
+  
+//       // Connection is not null, proceed with invoking SendMessage
+//       connection.invoke('SendMessage', inputUser, inputMessage)
+//         .then(() => {
+//           console.log('Message sent successfully:', inputUser, inputMessage);
+//           // Clear input fields after sending the message
+//           setInputUser('');
+//           setInputMessage('');
+//           // Update messages state with the sent message
+//           setMessages(prevMessages => [...prevMessages, { user: inputUser, message: inputMessage }]);
+//         })
+//         .catch(err => console.error('Error sending message:', err.toString()));
+//     } else {
+//       console.error('User and message cannot be empty.');
+//     }
+//   };
+  
+//   const initializeSignalRConnection = () => {
+//     const newConnection = new HubConnectionBuilder()
+//       .withUrl('https://localhost:7217/chathub') // Update URL if needed
+//       .withAutomaticReconnect()
+//       .build();
+  
+//     newConnection.start()
+//       .then(() => {
+//         console.log('SignalR Connected');
+//         setIsConnected(true); // Update connection status
+//         setConnection(newConnection); // Set the new connection
+//       })
+//       .catch(err => console.error('SignalR Connection Error: ', err));
+//   };
+
+//   return (
+//     <div>
+//       <div>
+//         {/* Display the list of messages */}
+//         <ul data-testid="messages-list">
+//           {messages.map((msg, index) => (
+//             <li key={index}>{`${msg.user} says: ${msg.message}`}</li>
+//           ))}
+//         </ul>
+//       </div>
+//       {/* Input fields for user and message */}
+//       <input type="text" placeholder="Enter user" value={inputUser} onChange={e => setInputUser(e.target.value)} />
+//       <input type="text" placeholder="Enter message" value={inputMessage} onChange={e => setInputMessage(e.target.value)} />
+//       {/* Send button */}
+//       <button onClick={handleSendClick} disabled={!isConnected}>Send with React</button>
+//     </div>
+ 
+//   )}
+//   export default ChatComponent;
+
+import React, { useState, useEffect } from 'react';
+import { HubConnectionBuilder } from '@microsoft/signalr';
+import { useUser } from './../../context/UserContext';
+
+const ChatComponent = () => {
+  const [messages, setMessages] = useState([]);
+  const [connection, setConnection] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [inputReceiverId, setInputReceiverId] = useState('');
+  const [inputMessage, setInputMessage] = useState('');
+  const { user } = useUser();
+
+  useEffect(() => {
+    const newConnection = new HubConnectionBuilder()
+      .withUrl('https://localhost:7217/chathub')
+      .withAutomaticReconnect()
+      .build();
+
+    newConnection.on('ReceiveMessage', (senderId, message) => {
+      console.log('Received senderId:', senderId);
+      console.log('Received message:', message); // Add logging for received message
+      setMessages(prevMessages => [...prevMessages, { senderId, message }]);
+    });
+
+    newConnection.start()
+      .then(() => {
+        console.log('SignalR Connected');
+        setIsConnected(true);
+        setConnection(newConnection);
+      })
+      .catch(err => console.error('SignalR Connection Error: ', err));
+
+    return () => {
+      if (connection) {
+        connection.stop();
+      }
+    };
+  }, []);
+
+  const handleSendClick = () => {
+    if (inputReceiverId.trim() !== '' && inputMessage.trim() !== '') {
+      if (!connection) {
+        console.log('SignalR connection is null. Reinitializing...');
+        initializeSignalRConnection(); // Reinitialize SignalR connection
+        return; // Exit the function and wait for the connection to be reinitialized
+      }
+      connection.invoke('SendMessageToUser', inputReceiverId, user.userId , inputMessage) // Pass user.userId to backend
+        .then(() => {
+          console.log('Message sent successfully:', inputMessage);
+          setInputMessage('');
+          // Add the sent message to the messages list
+          setMessages(prevMessages => [...prevMessages, { senderId: user.userId, message: inputMessage }]);
+        })
+        .catch(err => console.error('Error sending message:', err.toString()));
+    } else {
+      console.error('Receiver ID and Message cannot be empty.');
+    }
+  };
+  const initializeSignalRConnection = () => {
+    const newConnection = new HubConnectionBuilder()
+      .withUrl('https://localhost:7217/chathub') // Update URL if needed
+      .withAutomaticReconnect()
+      .build();
+  
+    newConnection.start()
+      .then(() => {
+        console.log('SignalR Connected');
+        setIsConnected(true); // Update connection status
+        setConnection(newConnection); // Set the new connection
+      })
+      .catch(err => console.error('SignalR Connection Error: ', err));
+  };
+
+  return (
+    <div>
+      <div>
+        <ul>
+          {messages.map((msg, index) => (
+            <li key={index}>{`${msg.senderId}: ${msg.message}`}</li>
+          ))}
+        </ul>
+      </div>
+      <input type="text" placeholder="Enter receiver ID" value={inputReceiverId} onChange={e => setInputReceiverId(e.target.value)} />
+      <br />
+      <input type="text" placeholder="Enter message" value={inputMessage} onChange={e => setInputMessage(e.target.value)} />
+      <br />
+      <button onClick={handleSendClick} disabled={!isConnected}>Send</button>
+    </div>
+  );
+};
+
+export default ChatComponent;
+
+
+import React, { useState, useEffect } from "react";
+import MessageDisplay from './MessageDisplay';
+import MessageInput from './MessageInput';
+import UserList from './UserList';
+import Notification from './ChatNotification';
+import * as signalR from "@microsoft/signalr";
+
+const Chat = () => {
+  const [currentReceiverId, setCurrentReceiverId] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [notification, setNotification] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [connection, setConnection] = useState(null);
+
+  useEffect(() => {
+    const newConnection = new signalR.HubConnectionBuilder()
+      .withUrl("https://localhost:7217/chatHub") // Replace with your SignalR hub URL
+      .build();
+
+    setConnection(newConnection);
+
+    newConnection
+      .start()
+      .then(() => console.log("SignalR Connected"))
+      .catch((error) => console.log("SignalR Connection Error: ", error));
+
+    return () => {
+      newConnection.stop();
+    };
+  }, []);
+
+  const selectReceiver = (receiverId) => {
+    setCurrentReceiverId(receiverId);
+  };
+
+  const sendMessageToReceiver = (messageText) => {
+    if (!currentReceiverId) {
+      setNotification('Select a user to send a message.');
+      return;
+    }
+
+    connection.invoke("SendMessage", currentReceiverId, messageText)
+      .catch((error) => console.log("SignalR Invoke Error: ", error));
+  };
+
+  // Fetch users from an API or use a mock data array
+  const fetchUsers = async () => {
+    const response = await fetch("https://localhost:7217/api/Users");
+    const data = await response.json();
+    setUsers(data);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  return (
+    <div className="chat-container">
+      <div className="chat">
+        <UserList users={users} selectReceiver={selectReceiver} />
+        <MessageDisplay messages={messages} />
+        <MessageInput sendMessage={sendMessageToReceiver} />
+      </div>
+      {notification && <Notification message={notification} />}
+      {currentReceiverId && <p>Selected user: {currentReceiverId}</p>}
+    </div>
+  );
+};
+
+export default Chat;
+
+
+

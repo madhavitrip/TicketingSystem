@@ -18,7 +18,7 @@ const AddTicket = lazy(() => import('./../views/Tickets/AddTicket'));
 const EditTicket = lazy(() => import('./../views/Tickets/EditTicket'))
 const ViewAllTickets = lazy(() => import('./../views/Tickets/ViewAllTickets'))
 const Archive = lazy(() => import('./../views/ArchivingTicket/Archive'))
-
+const Chat = lazy(() => import('./../views/Chats/Chat'))
 const MasterManagement = lazy(() => import('./../views/Department/Departments'))
 const Profile = lazy(() => import('./../views/UserProfile/Profile'))
 const Settings = lazy(() => import('./../../src/views/SettingsNav/Settings'))
@@ -58,7 +58,7 @@ const AppContent = () => {
           <Route path= "/Users/UpdatePermission" name= "Update Permission" element={<PermissionDecorator moduleId={7} permissionType="canUpdateOnly" element={<UpdatePermission/>}/>} />
           <Route path= "/Tickets/EditTicket/:ticketId" name= "Edit Ticket" element={<PermissionDecorator moduleId={2} permissionType="canUpdateOnly" element={<EditTicket/>}/>} />
           <Route path= "/Department/Departments" name= "Master Management"  element={<MasterManagement/>}/> 
-
+          <Route path= "/Chats/Chat" name= "Chat"  element={<Chat/>}/> 
           {/* <Route path="/403" name="Access Denied" element={<AccessDeniedPage />} /> */}
         </Routes>
       </Suspense>
